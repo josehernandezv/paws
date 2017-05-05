@@ -12,14 +12,45 @@ import {
   View
 } from 'react-native';
 
+// import Navigator from 'react-native-deprecated-custom-components'
+const Navigator = require('./node_modules/react-native-deprecated-custom-components/src/Navigator');
+
+
+//components
+const Login = require('./src/components/loginView');
+const SignUp = require('./src/components/signupView');
+const Main = require('./src/components/mainView');
+
 export default class Paws extends Component {
+  
+  renderScene(route, navigator) {
+    switch (route.name) {
+      case 'Login':
+        return (
+          <Login {...route.props} navigator={navigator} route={route}></Login>
+        );
+      case 'Signup':
+        return (
+          <SignUp {...route.props} navigator={navigator} route={route}></SignUp>
+        );
+      case 'Main':
+        return (
+          <Main {...route.props} navigator={navigator} route={route}></Main>
+        );
+    }
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to Paws!
-        </Text>
-      </View>
+      <Navigator style={{backgroundColor: '#fff'}}
+          initialRoute={{name:'Login'}}
+          renderScene={this.renderScene}
+          configureScene={(route) => {
+            if(route.sceneConfig) {
+              return route.sceneConfig;
+            }
+            return Navigator.SceneConfigs.FloatFromRight;
+          }}/>
     );
   }
 }
