@@ -19,6 +19,8 @@ import {
     Toast
 } from 'native-base';
 
+import GoogleSignIn from 'react-native-google-sign-in';
+
 const firebase = require('../database/firebase')
 var {FBLogin, FBLoginManager} = require('react-native-facebook-login');
 
@@ -86,7 +88,7 @@ class signupView extends Component {
                                 name: 'Main',
                                 passProps: { user: {
                                     email: profile.email,
-                                    username: profile.name
+                                    username: profile.first_name
                                 }} 
                             });
                         } else {
@@ -94,13 +96,13 @@ class signupView extends Component {
                                  firebase.database().ref('users/' + firebase.auth().currentUser.uid).set({
                                     id:  firebase.auth().currentUser.uid,
                                     email: profile.email,
-                                    username: profile.name
+                                    username: profile.first_name
                                 });
                                 self.props.navigator.replace({
                                     name: 'Main',
                                     passProps: { user: {
                                         email: profile.email,
-                                        username: profile.name
+                                        username: profile.first_name
                                     }} 
                                 });              
                             } catch (error) {
@@ -121,8 +123,49 @@ class signupView extends Component {
 
     }
 
-    googleSignup() {
-        this.showToast('Not supported yet');
+    async googleSignup() {
+        var self = this;
+        await GoogleSignIn.configure({
+            clientID: '804759165602-qim4grv81neao38olojij9lnin9gdhna.apps.googleusercontent.com',
+            scopes: ['openid', 'email', 'profile'],
+            shouldFetchBasicProfile: true,
+            serverClientID: '804759165602-qim4grv81neao38olojij9lnin9gdhna.apps.googleusercontent.com'
+        });
+        const user = await GoogleSignIn.signInPromise();
+        var credential = firebase.auth.GoogleAuthProvider.credential(user.idToken);
+
+        firebase.auth().signInWithCredential(credential).then(function() {
+            firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("value").then(function(snapshot) {
+                if (snapshot.exists()) {
+                    self.props.navigator.replace({
+                        name: 'Main',
+                        passProps: { user: {
+                            email: user.email,
+                            username: user.givenName
+                        }} 
+                    });
+                } else {
+                    try {
+                        firebase.database().ref('users/' + firebase.auth().currentUser.uid).set({
+                            id:  firebase.auth().currentUser.uid,
+                            email: user.email,
+                            username: user.givenName
+                        });
+                        self.props.navigator.replace({
+                            name: 'Main',
+                            passProps: { user: {
+                                email: user.email,
+                                username: user.givenName
+                            }} 
+                        });              
+                    } catch (error) {
+                        self.showToast(error.message)
+                    }             
+                }
+            });
+        }).catch(function(error) {
+            self.showToast(error);
+        });
     }
 
     render() {

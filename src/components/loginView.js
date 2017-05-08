@@ -19,6 +19,8 @@ import {
     Toast
 } from 'native-base';
 
+import GoogleSignIn from 'react-native-google-sign-in';
+
 const firebase = require('../database/firebase')
 var {FBLogin, FBLoginManager} = require('react-native-facebook-login');
 
@@ -44,34 +46,27 @@ class loginView extends Component {
     async login() {
         var self = this;
         try {
-            await firebase.auth()
-                .signInWithEmailAndPassword(this.state.email, this.state.password);
-
+            await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
             firebase.database().ref("users").orderByChild("email").equalTo(this.state.email).on("child_added",function(snapshot) {
                  self.props.navigator.replace({
                     name: 'Main',
                     passProps: { user: snapshot.val()} 
                 });
             });
-
-               
-            // Navigate to the Home page
-
         } catch (error) {
             self.showToast(error.message);
         }
-
     }
 
     async facebookLogin() {
         var self = this;
         FBLoginManager.loginWithPermissions(['email'], (error, data) => {
             if (!error) {
-                const credential = firebase.auth.FacebookAuthProvider.credential(data.credentials.token);
-                firebase.auth().signInWithCredential(credential).then(function() {
-                    var profile = JSON.parse(data.profile);
-                    firebase.database().ref("users").orderByChild("email").equalTo(profile.email).once("value").then(function(snapshot) {
-                        if (snapshot.exists()) {
+                var profile = JSON.parse(data.profile);
+                firebase.database().ref("users").orderByChild("email").equalTo(profile.email).once("value").then(function(snapshot) {
+                    if (snapshot.exists()) {
+                        const credential = firebase.auth.FacebookAuthProvider.credential(data.credentials.token);
+                        firebase.auth().signInWithCredential(credential).then(function() {
                             self.props.navigator.replace({
                                 name: 'Main',
                                 passProps: { user: {
@@ -79,39 +74,45 @@ class loginView extends Component {
                                     username: profile.name
                                 }} 
                             });
-                        } else {
-                            try {
-                                 firebase.database().ref('users/' + firebase.auth().currentUser.uid).set({
-                                    id:  firebase.auth().currentUser.uid,
-                                    email: profile.email,
-                                    username: profile.name
-                                });
-                                self.props.navigator.replace({
-                                    name: 'Main',
-                                    passProps: { user: {
-                                        email: profile.email,
-                                        username: profile.name
-                                    }} 
-                                });              
-                            } catch (error) {
-                                self.showToast(error.message)
-                            }             
-                        }
-                    });
-
-
-
-                }).catch(function(error) {
-                    self.showToast(error);
-                });
-            } else {
-                console.log(error, data);
+                        }).catch(function(error) {
+                            self.showToast(error);
+                        });
+                    } else {
+                       self.showToast('Please sign in first');                      
+                    }
+                 });
             }
         });
     }
 
-    googleLogin() {
-        this.showToast('Not supported yet');
+    async googleLogin() {
+        var self = this;
+        await GoogleSignIn.configure({
+            clientID: '804759165602-qim4grv81neao38olojij9lnin9gdhna.apps.googleusercontent.com',
+            scopes: ['openid', 'email', 'profile'],
+            shouldFetchBasicProfile: true,
+            serverClientID: '804759165602-qim4grv81neao38olojij9lnin9gdhna.apps.googleusercontent.com'
+        });
+        const user = await GoogleSignIn.signInPromise();
+
+        firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("value").then(function(snapshot) {
+            if (snapshot.exists()) {
+                var credential = firebase.auth.GoogleAuthProvider.credential(user.idToken);
+                firebase.auth().signInWithCredential(credential).then(function() {
+                    self.props.navigator.replace({
+                        name: 'Main',
+                        passProps: { user: {
+                            email: user.email,
+                            username: user.givenName
+                        }} 
+                    });
+                }).catch(function(error) {
+                    self.showToast(error.message)
+                }) 
+            } else {
+                self.showToast('Please sign in first')
+            }
+        });
     }
 
     render() {
