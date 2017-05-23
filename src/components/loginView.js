@@ -5,7 +5,8 @@ import {
     View,
     Text,
     StyleSheet,
-    Image
+    Image,
+    StatusBar
 } from 'react-native';
 
 import { 
@@ -118,6 +119,7 @@ class loginView extends Component {
     render() {
         return (
             <Container>
+                <StatusBar backgroundColor="#000" barStyle="light-content"/>
                 <Image style={styles.container} source={require('../images/LoginBackground.jpg')}>
                     <Image style={styles.title} source={require('../images/Title.png')}/>
                     <Item rounded style={StyleSheet.flatten(styles.item)}>
