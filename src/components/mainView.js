@@ -25,7 +25,9 @@ const SignUp = require('./signupView');
 const First = require('./firstView');
 const Second = require('./secondView');
 const SearchAnimals = require('./searchAnimalsView');
-
+const MedicalRecords = require('./medicalRecordsView');
+const FormMedicalRecord = require('./formMedicalRecordView');
+const IndividualMedicalRecord = require('./individualMedicalRecordView');
 
 class mainView extends Component {
 
@@ -57,6 +59,18 @@ class mainView extends Component {
             case 'SearchAnimals':
                 return (
                     <SearchAnimals {...route.props} navigator={navigator} route={route}></SearchAnimals>
+                );
+            case 'MedicalRecords':
+                return (
+                    <MedicalRecords {...route.props} navigator={navigator} route={route}></MedicalRecords>
+                );
+            case 'FormMedicalRecord':
+                return (
+                    <FormMedicalRecord {...route.props} navigator={navigator} route={route}></FormMedicalRecord>
+                );
+            case 'IndividualMedicalRecord':
+                return (
+                    <IndividualMedicalRecord {...route.props} navigator={navigator} route={route}></IndividualMedicalRecord>
                 );
         }
         
