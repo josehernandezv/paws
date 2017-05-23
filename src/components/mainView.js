@@ -5,34 +5,149 @@ import {
     View,
     Text,
     StyleSheet,
-    Image
+    Image,
+    StatusBar
 } from 'react-native';
 
 import { 
     Container,
-    Content
+    Content,
+    Drawer,
+    Header,
+    Button,
+    Icon,
 } from 'native-base';
+
+const SideBar = require('./sideBar');
+const Navigator = require('../../node_modules/react-native-deprecated-custom-components/src/Navigator');
+const Login = require('./loginView');
+const SignUp = require('./signupView');
+const First = require('./firstView');
+const Second = require('./secondView');
 
 
 class mainView extends Component {
 
     constructor(props) {
         super(props);
-        this.user = this.props.route.passProps.user;
+        this.state = { 
+            user: this.props.route.passProps.user
+        };
+    }
+
+    renderScene(route, navigator) {
+        switch (route.name) {
+            case 'Login':
+                return (
+                    <Login {...route.props} navigator={navigator} route={route}></Login>
+                );
+            case 'Signup':
+                return (
+                    <SignUp {...route.props} navigator={navigator} route={route}></SignUp>
+                );
+            case 'First':
+                return (
+                    <First {...route.props} navigator={navigator} route={route}></First>
+                );
+            case 'Second':
+                return (
+                    <Second {...route.props} navigator={navigator} route={route}></Second>
+                );
+        }
+        
+    }
+
+    getNavigatorBarRouteMapper() {
+        var self = this;
+        return {
+            LeftButton: function(route, navigator, index) {
+                if (index == 0) {
+                    return (
+                        <View style={styles.headerSection}>
+                            <Icon name='md-menu' style={StyleSheet.flatten(styles.headerIcon)} onPress={() => self.openDrawer()}/>
+                        </View>
+                    );
+                }   
+                return (
+                    <View style={styles.headerSection}>
+                        <Icon name='md-arrow-round-back' style={StyleSheet.flatten(styles.headerIcon)} onPress={() => {
+                            if (index > 0 ) {
+                                navigator.pop();
+                            }
+                        }}/>
+                    </View>
+                );
+            }, 
+            RightButton: function(route, navigator, index) {
+                if (route.name == 'First') {
+                    return (
+                        <View style={styles.headerSection}>
+                            <Icon name='md-add' style={StyleSheet.flatten(styles.headerIcon)} 
+                             onPress={() => {
+                                 navigator.push({
+                                    name: 'Second',
+                                    title: 'Second View',
+                                    passProps: {user: self.state.user}
+                                })
+                             }}/>
+                        </View>
+                    );
+                }
+                return null;
+            },
+            Title: function(route, navigator, index) {
+                return (
+                    <View style={styles.headerSection}>                    
+                        <Text style={styles.t_title}>
+                            {route.title}
+                        </Text>
+                    </View>
+                );
+            }
+        }
+    }
+
+    closeDrawer() {
+        this.drawer._root.close()
+    }
+
+    openDrawer() {
+        this.drawer._root.open()
     }
 
     render() {
+        var self = this;
         return (
-            <Container>
-                <Content>
-                    <View style={styles.container}>
-                        <Text style={styles.welcome}>
-                            Welcome {this.user.username}
-                        </Text>
-                    </View>
-                </Content>
-            </Container>
+             <Drawer
+                ref={(ref) => { this.drawer = ref; }}
+                content={<SideBar close={this.closeDrawer.bind(this)} navigator={this.getNavigator.bind(this)} />}
+                onClose={() => this.closeDrawer()} >
+
+                <StatusBar backgroundColor="#00796B" barStyle="light-content"/>
+                
+                <Navigator ref="navigator"
+                    style={{backgroundColor: '#fff'}}
+                    initialRoute={{name:'First', title: 'First View', passProps: {user: self.state.user}}}
+                    renderScene={this.renderScene}
+                    configureScene={(route) => {
+                        if(route.sceneConfig) {
+                            return route.sceneConfig;
+                        }
+                        return Navigator.SceneConfigs.FloatFromRight;
+                    }}
+                     navigationBar={
+                         <Navigator.NavigationBar style={styles.header} routeMapper={this.getNavigatorBarRouteMapper()} />
+                    }         
+                />
+
+            </Drawer>
+            
         );
+    }
+
+    getNavigator(){
+        console.log(this.refs)
+        return this.refs.navigator;
     }
 }
 
@@ -47,6 +162,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#00BCD4'
+  },
+  t_title: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  header: {
+  	backgroundColor: '#009688'
+  },
+  headerSection: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingLeft: 20,
+    paddingRight: 20
+  },
+  headerIcon: {
+    color: '#fff',
   }
 });
 

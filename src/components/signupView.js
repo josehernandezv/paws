@@ -5,7 +5,8 @@ import {
     View,
     Text,
     StyleSheet,
-    Image
+    Image,
+    StatusBar
 } from 'react-native';
 
 import { 
@@ -171,6 +172,7 @@ class signupView extends Component {
     render() {
         return (
             <Container>
+                <StatusBar backgroundColor="#000" barStyle="light-content"/>
                 <Image style={styles.container} source={require('../images/SignupBackground.jpg')}>
                     <Image style={styles.title} source={require('../images/Title.png')}/>
                     <Item inlineLabel>
