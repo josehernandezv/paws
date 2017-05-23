@@ -192,42 +192,42 @@ module.exports = searchAnimalsView;
 
 
 
-    insertAnimal(){
-        var self = this;
-        try {
-            firebase.database().ref("animals/dogs/" + 1).set({
-                id: 1,
-                specie: 'dog',
-                breed: '',
-                description: '',
-                height: {
-                    female: {
-                        min: 55,
-                        max: 60
-                    },
-                    male: {
-                        min: 60,
-                        max: 65
-                    }
-                },
-                imgUrl: '',
-                lifeSpan: {
-                    min: 9,
-                    max: 13
-                },
-                reference: '',
-                weight: {
-                    female: {
-                        min: 22,
-                        max: 32
-                    },
-                    male: {
-                        min: 30,
-                        max: 40
-                    }
-                }
-            });
-        } catch (error) {
-            self.showToast(error.message);
-        }
-    }
+    // insertAnimal(){
+    //     var self = this;
+    //     try {
+    //         firebase.database().ref("animals/dogs/" + 1).set({
+    //             id: 1,
+    //             specie: 'dog',
+    //             breed: '',
+    //             description: '',
+    //             height: {
+    //                 female: {
+    //                     min: 55,
+    //                     max: 60
+    //                 },
+    //                 male: {
+    //                     min: 60,
+    //                     max: 65
+    //                 }
+    //             },
+    //             imgUrl: '',
+    //             lifeSpan: {
+    //                 min: 9,
+    //                 max: 13
+    //             },
+    //             reference: '',
+    //             weight: {
+    //                 female: {
+    //                     min: 22,
+    //                     max: 32
+    //                 },
+    //                 male: {
+    //                     min: 30,
+    //                     max: 40
+    //                 }
+    //             }
+    //         });
+    //     } catch (error) {
+    //         self.showToast(error.message);
+    //     }
+    // }
