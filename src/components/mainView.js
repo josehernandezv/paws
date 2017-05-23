@@ -146,7 +146,6 @@ class mainView extends Component {
     }
 
     getNavigator(){
-        console.log(this.refs)
         return this.refs.navigator;
     }
 }

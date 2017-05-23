@@ -75,7 +75,6 @@ class mainView extends Component {
             title: 'Segund Vista',
             passProps: {}
         });
-        console.log(this.props)
         this.props.close();
     }
 
