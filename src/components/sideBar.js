@@ -36,7 +36,7 @@ const datas = [
 //   },
   {
     name: 'Add new pet',
-    route: '',
+    route: 'SearchAnimals',
     icon: 'md-add-circle',
   },
   {
@@ -71,8 +71,8 @@ class mainView extends Component {
 
     navigate(data) {
         this.props.navigator().replace({
-            name: 'Second',
-            title: 'Segund Vista',
+            name: data.route,
+            title: data.name,
             passProps: {}
         });
         this.props.close();

@@ -24,6 +24,7 @@ const Login = require('./loginView');
 const SignUp = require('./signupView');
 const First = require('./firstView');
 const Second = require('./secondView');
+const SearchAnimals = require('./searchAnimalsView');
 
 
 class mainView extends Component {
@@ -52,6 +53,10 @@ class mainView extends Component {
             case 'Second':
                 return (
                     <Second {...route.props} navigator={navigator} route={route}></Second>
+                );
+            case 'SearchAnimals':
+                return (
+                    <SearchAnimals {...route.props} navigator={navigator} route={route}></SearchAnimals>
                 );
         }
         
