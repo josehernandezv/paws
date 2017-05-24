@@ -6,7 +6,8 @@ import {
     Text,
     StyleSheet,
     Image,
-    StatusBar
+    StatusBar,
+    Alert
 } from 'react-native';
 
 import { 
@@ -26,15 +27,36 @@ import {
     Toast
 } from 'native-base';
 
+import SearchBar from 'react-native-searchbar';
+
 const firebase = require('../database/firebase')
+console.ignoredYellowBox = ['Setting a timer'];
 
 class dogsDescriptionView extends Component {
 
     constructor(props) {
         super(props);
-        
+        this.passProps = this.props.route.passProps
     }
 
+
+    render() {
+        var self = this;
+        return (
+             <Container style={StyleSheet.flatten(styles.container)}>
+                <Content>
+                  <View>
+                    {/*<Image source={{uri: this.passProps.animal.Thumbnail.path+'.jpg'}}/>*/}
+                    <Text>{this.passProps.animal.description}</Text>
+                    
+                  </View>
+
+                </Content>
+                   
+            </Container>
+            
+        )
+    }
 
 
 }
