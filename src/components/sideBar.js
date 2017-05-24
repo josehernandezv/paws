@@ -41,7 +41,7 @@ const datas = [
   },
   {
     name: 'Medical Records',
-    route: '',
+    route: 'MedicalRecords',
     icon: 'ios-list-box',
   },
   {
