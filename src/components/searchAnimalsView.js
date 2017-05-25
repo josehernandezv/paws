@@ -8,7 +8,8 @@ import {
     Image,
     StatusBar,
     Alert,
-    TouchableHighlight
+    TouchableHighlight,
+    TextInput
 } from 'react-native';
 
 import SearchBar from 'react-native-material-design-searchbar';
@@ -41,7 +42,9 @@ class searchAnimalsView extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            animals: []
+            animals: [],
+            text: '',
+            search: ''
         };
         
         this.getAnimals();
@@ -143,20 +146,42 @@ class searchAnimalsView extends Component {
         //Alert.alert("adadsdd", "adsasd "+animal.breed);
     }
 
-    search(animals){
-        
+    // filterSearch(text){
+    //     const newData = data.filter(function (item){
+    //         const itemData = item.breed
+    //         const textData = text
+    //         return itemData.indexOf(textData) > -1
+    //     })
+    //     this.setState({
+    //         dataSource: this.state.dataSource.cloneWithRows(newData),
+    //         text: text
+    //     })
+    // }
 
+    updateSearch(event){
+        this.setState({
+            search: event.target.value.substr(
+                0,20
+            )});
     }
 
     render() {
         var self = this;
+        // let filteredAnimals = this.props.filter(
+        //     (animal) => {
+        //         return animal.breed.toLowerCase().indexOf(this.state.search) !== -1;
+        //     }
+        // );
         return (
              <Container style={StyleSheet.flatten(styles.container)}>
                 <Content>
                     <View>
-
+                        {/*<Input type="text" value={this.state.search} onChange={this.updateSearch.bind(this)}/>*/}
+                    {/*<TextInput onChangeText={(text) => this.filterSearch(text)}
+                        value={this.state.text}
+                        />
                         <SearchBar
-                            onSearchChange={() => this.search()}
+                            onSearchChange={() => this.search(text)}
                             height={50}
                             onFocus={() => console.log('On Focus')}
                             onBlur={() => console.log('On Blur')}
@@ -175,7 +200,7 @@ class searchAnimalsView extends Component {
                             <Button transparent>
                                 <Text>Search</Text>
                             </Button>
-                        </Header>
+                        </Header>*/}
                     <List dataArray={this.state.animals} renderRow={animal =>
                         
                         <ListItem onPress={() => this.pressed(animal)}>
