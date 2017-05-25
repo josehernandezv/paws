@@ -75,7 +75,8 @@ class mainView extends Component {
             title: data.name,
             passProps: {}
         });
-        this.props.close();
+        setTimeout(() => { this.props.close();}, 300)
+        
     }
 
     render() {

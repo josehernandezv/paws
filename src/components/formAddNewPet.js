@@ -27,49 +27,40 @@ import {
     Toast,
     Fab,
     Right,
-    Left,
-    Input
+    Left
 } from 'native-base';
 
-import SearchBar from 'react-native-searchbar';
-
 const firebase = require('../database/firebase')
-const Navigator = require('../../node_modules/react-native-deprecated-custom-components/src/Navigator');
-console.ignoredYellowBox = ['Setting a timer'];
 
-class dogsDescriptionView extends Component {
+class formAddNewPet extends Component {
 
     constructor(props) {
         super(props);
         this.passProps = this.props.route.passProps
     }
 
+    showToast(message) {
+        Toast.show({
+            supportedOrientations:['portrait','landscape'],
+            text: message,
+            position: 'bottom',
+            buttonText: 'Ok'
+        })
+    }
+
 
     render() {
-        var self = this;
         return (
              <Container style={StyleSheet.flatten(styles.container)}>
-                <Content  style={{ flex: 1 }} contentContainerStyle={{ flex: 1 }}>
-                    {/*<Image source={{uri: this.passProps.animal.Thumbnail.path+'.jpg'}}/>*/}
-                    <Text>{this.passProps.animal.description}</Text>
-                    <Fab active={true} style={{ backgroundColor: '#009688'}} position="bottomRight"
-                      onPress={() => {
-                          //console.log('Fab pressed')
-                          this.props.navigator.push({
-                            name: 'FormAddPet',
-                            title: 'Add new Pet',
-                            passProps: {}
-                      })}}>
-                          <Icon name="md-add" />
-                    </Fab>
-
+                <Content>
+                    <View>
+                        <Text>asdasdasd</Text>
+                    </View>
                 </Content>
-                   
             </Container>
             
         )
     }
-
 
 }
 
@@ -105,4 +96,4 @@ const styles = StyleSheet.create({
   }
 });
 
-module.exports = dogsDescriptionView;
+module.exports = formAddNewPet;
