@@ -57,15 +57,9 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
         render() {
             return (
                 <Container style={StyleSheet.flatten(styles.container)}>
+                    <Content style={{ flex: 1 }} contentContainerStyle={{ flex: 1 }}>
                     
-                    <Fab style={{ backgroundColor: '#009688'}} position="bottomRight"
-                    onPress={() => this.props.navigator.push({
-                        name: 'FormMedicalRecord',
-                        title: 'Add new record',
-                        passProps: {}
-                    })}>
-                        <Icon name="md-add" />
-                    </Fab>
+                    
                     
                     <Item searchBar rounded style={{marginLeft: 10, marginRight: 10, marginBottom: 20, backgroundColor: '#fff'}} >
                         <Icon name="md-search" style={{ color: 'gray'}}/>
@@ -92,6 +86,18 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
                             </Right>
                         </ListItem>}
                     />
+                    <Fab active={true}style={{ backgroundColor: '#009688'}} position="bottomRight"
+                    onPress={() => {
+                        console.log('Fab pressed')
+                    this.props.navigator.push({
+                        name: 'FormMedicalRecord',
+                        title: 'Add new record',
+                        passProps: {}
+                    })}}>
+                        <Icon name="md-add" />
+                    </Fab>
+                    </Content>
+                    
                 </Container>
             );
         }
@@ -102,11 +108,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F5FCFF',
         paddingTop: 80,
-    },
-    t_title: {
-        fontSize: 16,
-        color: '#fff',
-        fontWeight: 'bold',
     },
     header: {
         backgroundColor: '#009688'
