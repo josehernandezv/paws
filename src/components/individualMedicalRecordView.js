@@ -54,6 +54,12 @@ export default class individualMedicalRecordView extends Component {
             
     }
 
+	callback(args) {
+		this.setState({
+            record: args
+		});
+	}
+
 	render() {
 		return (
 			<Container style={StyleSheet.flatten(styles.container)}>
@@ -82,8 +88,11 @@ export default class individualMedicalRecordView extends Component {
 												<Icon name="md-create" style={StyleSheet.flatten(styles.baseColor)}
 												onPress={() => this.props.navigator.push({
                         							name: 'FormMedicalRecord',
-                       								title: 'Add new record',
-                        							passProps: {}
+                       								title: 'Edit record',
+                        							passProps: {record: this.state.record},
+													callback: this.callback.bind(this),
+													refreshList: this.props.route.refreshList
+
                     							})}/>
 											</Button>
 											<Button transparent>
@@ -112,11 +121,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#F5FCFF',
         paddingTop: 80,
     },
-	t_title: {
-		fontSize: 18,
-		color: '#fff',
-		fontWeight: 'bold',
-	},
 	header: {
 		backgroundColor: '#009688'
 	},

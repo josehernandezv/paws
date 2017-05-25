@@ -12,8 +12,6 @@ import {
     TextInput
 } from 'react-native';
 
-import SearchBar from 'react-native-material-design-searchbar';
-
 import { 
     Container,
     Content,
@@ -34,8 +32,6 @@ import {
 } from 'native-base';
 
 const firebase = require('../database/firebase');
-const Navigator = require('../../node_modules/react-native-deprecated-custom-components/src/Navigator');
-console.ignoredYellowBox = ['Setting a timer'];
 
 class searchAnimalsView extends Component {
 

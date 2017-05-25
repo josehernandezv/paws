@@ -16,7 +16,8 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
         constructor(props) {
             super(props);
             this.state = {
-                records: []
+                records: [],
+                filteredRecords: []
             };
         }
 
@@ -33,6 +34,10 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
             })
         }
 
+        refresh() {
+            this.getRecords();
+        }
+
         getRecords () {
             var self = this;
             try {
@@ -46,7 +51,7 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
                             key: child.key
                         })
                      });
-                     self.setState({records: records});
+                     self.setState({records: records, filteredRecords: records});
 
                 });
             } catch (error) {
@@ -54,25 +59,35 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
             }
         }
 
+        filter(searchText) {
+            var text = searchText.toLowerCase();
+            var filteredRecords = this.state.records.filter( (record) => {
+                var r = record.title.toLowerCase();
+                return r.search(text) !== -1;
+            });
+            this.setState({filteredRecords: filteredRecords})
+        }
+
+        
+
         render() {
             return (
                 <Container style={StyleSheet.flatten(styles.container)}>
                     <Content style={{ flex: 1 }} contentContainerStyle={{ flex: 1 }}>
-                    
-                    
-                    
+            
                     <Item searchBar rounded style={{marginLeft: 10, marginRight: 10, marginBottom: 20, backgroundColor: '#fff'}} >
                         <Icon name="md-search" style={{ color: 'gray'}}/>
-                        <Input placeholder="Search"/>
+                        <Input placeholder="Search" onChangeText={(searchText) => this.filter(searchText)}/>
                     </Item>
 
-                    <List dataArray={this.state.records} renderRow={record => 
+                    <List dataArray={this.state.filteredRecords} renderRow={record => 
                         
                         <ListItem 
                         onPress={() => this.props.navigator.push({
                             name: 'IndividualMedicalRecord',
-                            title: 'Medical Record Card',
-                            passProps: {record: record}
+                            title: 'Medical Record',
+                            passProps: {record: record},
+                            refreshList: this.refresh.bind(this)
                         })}>
                             <Body>
                                 <Text style={{fontWeight: 'bold'}}>{record.title}</Text>
@@ -92,7 +107,8 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
                     this.props.navigator.push({
                         name: 'FormMedicalRecord',
                         title: 'Add new record',
-                        passProps: {}
+                        passProps: {},
+                        refreshList: this.refresh.bind(this)
                     })}}>
                         <Icon name="md-add" />
                     </Fab>
