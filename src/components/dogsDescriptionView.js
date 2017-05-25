@@ -58,7 +58,7 @@ class dogsDescriptionView extends Component {
                           this.props.navigator.push({
                             name: 'FormAddPet',
                             title: 'Add new Pet',
-                            passProps: {}
+                            passProps: {animal: this.passProps.animal}
                       })}}>
                           <Icon name="md-add" />
                     </Fab>
