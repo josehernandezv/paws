@@ -108,20 +108,6 @@ class mainView extends Component {
                 );
             }, 
             RightButton: function(route, navigator, index) {
-                if (route.name == 'First') {
-                    return (
-                        <View style={styles.headerSection}>
-                            <Icon name='md-add' style={StyleSheet.flatten(styles.headerIcon)} 
-                             onPress={() => {
-                                 navigator.push({
-                                    name: 'Second',
-                                    title: 'Second View',
-                                    passProps: {user: self.state.user}
-                                })
-                             }}/>
-                        </View>
-                    );
-                }
                 return null;
             },
             Title: function(route, navigator, index) {
@@ -156,7 +142,7 @@ class mainView extends Component {
                 
                 <Navigator ref="navigator"
                     style={{backgroundColor: '#fff'}}
-                    initialRoute={{name:'First', title: 'First View', passProps: {user: self.state.user}}}
+                    initialRoute={{name:'First', title: 'Paws', passProps: {user: self.state.user}}}
                     renderScene={this.renderScene}
                     configureScene={(route) => {
                         if(route.sceneConfig) {

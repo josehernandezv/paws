@@ -14,13 +14,30 @@ export default class formMedicalRecordView extends Component {
 	
 	constructor(props) {
         super(props);
-        this.state = { 
-            title: '' ,
-            date: '',
-            details: '',
-            simpleDate: new Date(),
-			simpleText: 'Pick a date'
-        };
+		var record = this.props.route.passProps.record;
+		
+		if ("undefined" === typeof record) {
+			this.state = { 
+				title: '' ,
+				date: '',
+				details: '',
+				simpleDate: new Date(),
+				simpleText: 'Pick a date',
+				isUpdate: false
+			};
+		} else {
+			this.state = { 
+				title: record.title ,
+				date: record.date,
+				details: record.details,
+				simpleDate: new Date(),
+				simpleText: record.date,
+				isUpdate: true,
+				key: record.key
+			};
+		}
+
+        
     }
 
     showToast(message) {
@@ -35,19 +52,54 @@ export default class formMedicalRecordView extends Component {
     addRecord () {
     	var self = this;
         try {
-        	var newPost = firebase.database().ref("medicalRecords").push();
-            newPost.set({
+        	var newRecord = firebase.database().ref("medicalRecords").push();
+            newRecord.set({
                  title: this.state.title,
                  date: this.state.simpleText,
                  details: this.state.details,
             });
         	Alert.alert('Success', 'Medical record successfully added!',
             [
-              {text: 'OK', onPress: () => self.props.navigator.replace({
+              {text: 'OK', onPress: () => {
+						self.props.route.refreshList()		  		
+				  		self.props.navigator.replace({
                             name: 'IndividualMedicalRecord',
-                            title: 'Medical Record Card',
-                            passProps: {}
-                        })}
+                            title: 'Medical Record',
+                            passProps: {record: {
+								title: this.state.title,
+								date: this.state.simpleText,
+								details: this.state.details,
+								key: newRecord.key
+							}}
+                        })}}
+            ]
+          );
+        } catch (error) {
+            self.showToast(error.message);
+        }
+    }
+
+	editRecord () {
+    	var self = this;
+        try {
+        	var record = firebase.database().ref("medicalRecords/" + this.state.key);
+            record.set({
+                 title: this.state.title,
+                 date: this.state.simpleText,
+                 details: this.state.details,
+            });
+        	Alert.alert('Success', 'Medical record successfully edited!',
+            [
+              {text: 'OK', onPress: () => {
+				  			this.props.route.callback({
+								title: this.state.title,
+								date: this.state.simpleText,
+								details: this.state.details,
+								key: this.state.key
+							});
+							this.props.route.refreshList()
+				  			this.props.navigator.pop();
+                        }}
             ]
           )
         } catch (error) {
@@ -75,25 +127,14 @@ export default class formMedicalRecordView extends Component {
 	render() {
 		return (
 			<Container>
-				
-				<Header style={StyleSheet.flatten(styles.header)}>
-					<Left>
-						<Button transparent>
-							<Icon name='arrow-back' />
-						</Button>
-					</Left>
-					<Body>
-						<Text style={styles.t_title}>New Medical Record</Text>
-					</Body>
-				</Header>
 
 				<Content style={StyleSheet.flatten(styles.contentStyle)}>
 
 					<Form>
 
-						<Item floatingLabel>
+						<Item floatingLabel={!this.state.isUpdate} stackedLabel={this.state.isUpdate}>
 							<Label>Title</Label>
-							<Input onChangeText={(title) => this.setState({title})}/>
+							<Input onChangeText={(title) => this.setState({title})} value={this.state.title}/>
 						</Item>
 
 						<TouchableWithoutFeedback
@@ -106,11 +147,14 @@ export default class formMedicalRecordView extends Component {
 			 			<Label style={StyleSheet.flatten(styles.coloredTitle)}>Medical Record Details</Label>
                         	
                         	<TextInput multiline = {true} style={StyleSheet.flatten(styles.textarea)} 
-                        	onChangeText={(details) => this.setState({details})}/>
+                        	onChangeText={(details) => this.setState({details})}
+							value={this.state.details}/>
                     
                     		<Button full rounded style={StyleSheet.flatten(styles.add_button)}
-                    		onPress ={() => this.addRecord()}>
-								<Text style={StyleSheet.flatten(styles.button_text)}>Add to Records</Text>
+                    		onPress ={() => this.state.isUpdate ? this.editRecord() : this.addRecord() }>
+								<Text style={StyleSheet.flatten(styles.button_text)}>
+									{this.state.isUpdate ? 'Edit' : 'Add'} record
+								</Text>
 							</Button>
 					
 					</Form>
@@ -124,20 +168,15 @@ export default class formMedicalRecordView extends Component {
 }
 
 const styles = StyleSheet.create({
-	t_title: {
-		fontSize: 18,
-		color: '#fff',
-		fontWeight: 'bold',
-	},
 	contentStyle: {
 		padding: 20,
         backgroundColor: '#F5FCFF',
+		paddingTop: 60
 	},
 	header: {
 		backgroundColor: '#009688'
 	},
 	add_button: {
-		fontSize: 16,
 		marginLeft: 10,
 		marginRight: 10,
 		marginTop: 10,

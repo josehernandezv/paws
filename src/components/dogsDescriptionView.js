@@ -31,11 +31,7 @@ import {
     Input
 } from 'native-base';
 
-import SearchBar from 'react-native-searchbar';
-
 const firebase = require('../database/firebase')
-const Navigator = require('../../node_modules/react-native-deprecated-custom-components/src/Navigator');
-console.ignoredYellowBox = ['Setting a timer'];
 
 class dogsDescriptionView extends Component {
 
