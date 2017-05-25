@@ -14,12 +14,9 @@
     "react-native-deprecated-custom-components": "^0.1.0",
     "react-native-facebook-login": "^1.5.0",
     "react-native-google-sign-in": "0.0.14",
-<<<<<<< HEAD
     "react-native-material-design-searchbar": "^1.1.2",
-    "react-native-searchbar": "^1.10.0"
-=======
+    "react-native-searchbar": "^1.10.0",
     "react-native-modal-datetime-picker": "^4.6.0"
->>>>>>> 014706001d327630338bfe385fbdb05bb7d14b53
   },
   "devDependencies": {
     "babel-jest": "19.0.0",
