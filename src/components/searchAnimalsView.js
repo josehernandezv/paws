@@ -3,7 +3,6 @@
 import React, { Component } from 'react';
 import {
     View,
-    Text,
     StyleSheet,
     Image,
     StatusBar,
@@ -16,6 +15,7 @@ import {
     Container,
     Content,
     Drawer,
+    Text,
     Header,
     Button,
     Icon,
@@ -39,12 +39,11 @@ class searchAnimalsView extends Component {
         super(props);
         this.state = {
             animals: [],
-            text: '',
-            search: ''
+            filteredAnimals: [],
+            searchingDogs: true
         };
         
-        this.getAnimals();
-        this.getCats();
+        this.getDogs();
     }
 
     showToast(message) {
@@ -97,17 +96,54 @@ class searchAnimalsView extends Component {
         }
     }
 
-    getAnimals() {
+    getDogs() {
         var self = this;
+        this.setState({searchingDogs: true});
         try {
-            firebase.database().ref("animals/dogs").once("value",function(snapshot) {
-                // self.showToast(snapshot.child().breed);
-                // console.log(snapshot.val())
-                self.setState({animals: snapshot.val()})
-                //  self.props.navigator.replace({
-                //     name: 'Main',
-                //     passProps: { user: snapshot.val()} 
-                // });
+            firebase.database().ref("animals/dogs").orderByChild("breed").once("value",function(snapshot) {
+                self.setState({
+                    dogs: snapshot.val()
+                })
+
+
+                var dogs = [];
+                snapshot.forEach(function(child) {
+                dogs.push({
+                        key: child.key,
+                        specie: child.val().specie,
+                        breed: child.val().breed,
+                        description: child.val().description,
+                        height: {
+                            female: {
+                                min: child.val().height.female.min,
+                                max: child.val().height.female.max
+                            },
+                            male: {
+                                min: child.val().height.male.min,
+                                max: child.val().height.male.min
+                            }
+                        },
+                        imgUrl: child.val().imgUrl,
+                        lifeSpan: {
+                            min: child.val().lifeSpan.min,
+                            max: child.val().lifeSpan.max
+                        },
+                        reference: child.val().reference,
+                        weight: {
+                            female: {
+                                min: child.val().weight.female.min,
+                                max: child.val().weight.female.max
+                            },
+                            male: {
+                                min: child.val().weight.male.min,
+                                max: child.val().weight.male.max
+                            }
+                        }
+                    })
+                });
+                self.setState({animals: dogs, filteredAnimals: dogs});
+
+
             });
         } catch (error) {
             self.showToast(error.message);
@@ -116,22 +152,16 @@ class searchAnimalsView extends Component {
 
     getCats(){
         var self = this;
+        this.setState({searchingDogs: false});        
         try {
             firebase.database().ref("animals/cats").once("value", function(snapshot){
-                self.setState({animals: snapshot.val()})
+                self.setState({animals: snapshot.val(), filteredAnimals: snapshot.val()})
             });
         } catch (error) {
             self.showToast(error.message);
         }
     }
-
-    // onBreedPressed(animal){
-    //     this.props.navigator.push({
-    //         name: 'details',
-    //         Breed: animals.breed,
-    //         passProps: {animals: animal}
-    //     });
-    // }
+  
 
     pressed(animal){
         this.props.navigator.push({
@@ -139,88 +169,50 @@ class searchAnimalsView extends Component {
             tittle: animal.breed,
             passProps: {animal: animal}
         });
-        //Alert.alert("adadsdd", "adsasd "+animal.breed);
     }
 
-    // filterSearch(text){
-    //     const newData = data.filter(function (item){
-    //         const itemData = item.breed
-    //         const textData = text
-    //         return itemData.indexOf(textData) > -1
-    //     })
-    //     this.setState({
-    //         dataSource: this.state.dataSource.cloneWithRows(newData),
-    //         text: text
-    //     })
-    // }
-
-    updateSearch(event){
-        this.setState({
-            search: event.target.value.substr(
-                0,20
-            )});
+    filter(searchText) {
+        var text = searchText.toLowerCase();
+        var filteredAnimals = this.state.animals.filter( (animal) => {
+            var a = animal.breed.toLowerCase();
+            return a.search(text) !== -1;
+        });
+        this.setState({filteredAnimals: filteredAnimals})
     }
 
     render() {
         var self = this;
-        // let filteredAnimals = this.props.filter(
-        //     (animal) => {
-        //         return animal.breed.toLowerCase().indexOf(this.state.search) !== -1;
-        //     }
-        // );
         return (
              <Container style={StyleSheet.flatten(styles.container)}>
                 <Content>
-                    <View>
-                        {/*<Input type="text" value={this.state.search} onChange={this.updateSearch.bind(this)}/>*/}
-                    {/*<TextInput onChangeText={(text) => this.filterSearch(text)}
-                        value={this.state.text}
-                        />
-                        <SearchBar
-                            onSearchChange={() => this.search(text)}
-                            height={50}
-                            onFocus={() => console.log('On Focus')}
-                            onBlur={() => console.log('On Blur')}
-                            placeholder={'Search...'}
-                            autoCorrect={false}
-                            padding={5}
-                            returnKeyType={'search'}
-                            />
-
-                        <Header searchBar rounded>
-                            <Item>
-                                <Icon name="ios-search" />
-                                <Input placeholder="Search" />
-                                <Icon name="ios-people" />
-                            </Item>
-                            <Button transparent>
-                                <Text>Search</Text>
-                            </Button>
-                        </Header>*/}
-                    <List dataArray={this.state.animals} renderRow={animal =>
-                        
+                    <Item searchBar rounded style={{marginLeft: 10, marginRight: 10, marginBottom: 20, backgroundColor: '#fff'}} >
+                        <Icon name="md-search" style={{ color: 'gray'}}/>
+                        <Input placeholder="Search" onChangeText={(searchText) => this.filter(searchText)}/>
+                    </Item>
+                    
+                    <List dataArray={this.state.filteredAnimals} renderRow={animal =>
                         <ListItem onPress={() => this.pressed(animal)}>
-                                    
-                            <Thumbnail square size={80} source={require('../images/akita.jpg')} />
-                                
+                            <Thumbnail square style={StyleSheet.flatten(styles.thumbnail)} source={{uri: animal.imgUrl}} />
                             <Body>
-                                <Text>{animal.breed}</Text>
-                                <Text note>{animal.description}</Text>
+                                <Text >{animal.breed}</Text>
+                                <Text note numberOfLines={4}>{animal.description}</Text>
                             </Body>
                           
                         </ListItem>
                          }
-                        
                     />
-                   </View>
                 </Content>
                     <Footer>
-                        <FooterTab>
-                            <Button onPress={() => this.getAnimals()}>
-                                <Text>Dogs</Text>
+                        <FooterTab style={StyleSheet.flatten(styles.footer)}>
+                            <Button style={StyleSheet.flatten(styles.footerButton)} onPress={() => this.getDogs()} active={this.state.searchingDogs}>
+                                <Text style={this.state.searchingDogs ? StyleSheet.flatten(styles.active) : StyleSheet.flatten(styles.inactive)}>
+                                    Dogs
+                                </Text>
                             </Button>
-                            <Button onPress={() => this.getCats()}>
-                                <Text>Cats</Text>
+                            <Button style={StyleSheet.flatten(styles.footerButton)} onPress={() => this.getCats()} active={!this.state.searchingDogs}>
+                                <Text style={!this.state.searchingDogs ? StyleSheet.flatten(styles.active) : StyleSheet.flatten(styles.inactive)}>
+                                    Cats
+                                </Text>
                             </Button>
                         </FooterTab>
                     </Footer>
@@ -237,74 +229,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
     paddingTop: 80
   },
-  welcome: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#00BCD4'
+  thumbnail: {
+      width: 100,
+      height: 100
   },
-  t_title: {
-    fontSize: 24,
-    color: '#fff',
-    fontWeight: 'bold',
+  footer: {
+      backgroundColor: '#F5FCFF'
   },
-  header: {
-  	backgroundColor: '#009688'
+  footerButton: {
+    backgroundColor: '#F5FCFF',
+    color: '#000'
   },
-  headerSection: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingLeft: 20,
-    paddingRight: 20
+  inactive: {
+    color: '#90A4AE'
   },
-  headerIcon: {
-    color: '#fff',
+  active: {
+    color: '#263238'
   }
 });
 
 module.exports = searchAnimalsView;
 
-
-
-
-
-    // insertAnimal(){
-    //     var self = this;
-    //     try {
-    //         firebase.database().ref("animals/dogs/" + 1).set({
-    //             id: 1,
-    //             specie: 'dog',
-    //             breed: '',
-    //             description: '',
-    //             height: {
-    //                 female: {
-    //                     min: 55,
-    //                     max: 60
-    //                 },
-    //                 male: {
-    //                     min: 60,
-    //                     max: 65
-    //                 }
-    //             },
-    //             imgUrl: '',
-    //             lifeSpan: {
-    //                 min: 9,
-    //                 max: 13
-    //             },
-    //             reference: '',
-    //             weight: {
-    //                 female: {
-    //                     min: 22,
-    //                     max: 32
-    //                 },
-    //                 male: {
-    //                     min: 30,
-    //                     max: 40
-    //                 }
-    //             }
-    //         });
-    //     } catch (error) {
-    //         self.showToast(error.message);
-    //     }
-    // }
