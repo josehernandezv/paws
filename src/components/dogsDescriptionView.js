@@ -3,34 +3,34 @@
 import React, { Component } from 'react';
 import {
     View,
-    Text,
     StyleSheet,
     Image,
-    StatusBar,
-    Alert
+    Dimensions
 } from 'react-native';
 
 import { 
     Container,
     Content,
-    Drawer,
-    Header,
     Button,
     Icon,
-    Footer,
-    FooterTab,
-    Badge,
-    List,
-    ListItem,
     Thumbnail,
     Body,
-    Toast,
     Fab,
+    H1,
+    H2,
+    H3,
+    Text,
     Right,
     Left,
-    Input
+    Card,
+    CardItem,
+
 } from 'native-base';
 
+import { Col, Row, Grid } from 'react-native-easy-grid';
+
+const deviceHeight = Dimensions.get('window').height;
+const deviceWidth = Dimensions.get('window').width;
 const firebase = require('../database/firebase')
 
 class dogsDescriptionView extends Component {
@@ -38,6 +38,7 @@ class dogsDescriptionView extends Component {
     constructor(props) {
         super(props);
         this.passProps = this.props.route.passProps
+        this.state = {dog: this.passProps.animal}
     }
 
 
@@ -45,21 +46,89 @@ class dogsDescriptionView extends Component {
         var self = this;
         return (
              <Container style={StyleSheet.flatten(styles.container)}>
-                <Content  style={{ flex: 1 }} contentContainerStyle={{ flex: 1 }}>
-                    {/*<Image source={{uri: this.passProps.animal.Thumbnail.path+'.jpg'}}/>*/}
-                    <Text>{this.passProps.animal.description}</Text>
-                    <Fab active={true} style={{ backgroundColor: '#009688'}} position="bottomRight"
+                
+
+                    <Image source={{uri: this.state.dog.imgUrl}} style={styles.fullImage}/>
+                    
+                    <View style={styles.header}>
+                        <H1>{this.state.dog.breed}</H1>
+                        <Text note>Dog</Text>
+                         <Fab active={true} style={{ backgroundColor: '#009688'}} position="topRight"
                       onPress={() => {
-                          //console.log('Fab pressed')
                           this.props.navigator.push({
                             name: 'FormAddPet',
                             title: 'Add new Pet',
-                            passProps: {animal: this.passProps.animal}
+                            passProps: {animal: this.passProps.animal},
+                            passProps: {
+                                animal: this.state.dog
+                            }
                       })}}>
                           <Icon name="md-add" />
                     </Fab>
+                    </View>
+                    <Content>
+                    <Card style={StyleSheet.flatten(styles.cardContainer)}>
+                        <CardItem header style={StyleSheet.flatten(styles.card)}>
+                            <Text style={StyleSheet.flatten(styles.title)}>General description</Text>
+                        </CardItem>
+                        <CardItem style={StyleSheet.flatten(styles.card)}>
+                            <Body>
+                                <Text>{this.state.dog.description}</Text>
+                            </Body>
+                        </CardItem>
+                   </Card>
+
+                   <Card style={StyleSheet.flatten(styles.cardContainer)}>
+                        <CardItem header style={StyleSheet.flatten(styles.card)}>
+                            <Text style={StyleSheet.flatten(styles.title)}>Height</Text>
+                        </CardItem>
+                        <CardItem style={StyleSheet.flatten(styles.card)}>
+                            <Icon style={StyleSheet.flatten(styles.icon)} name="md-male" />
+                            <Text>
+                                {this.state.dog.height.male.min} - {this.state.dog.height.male.max} cm
+                            </Text>
+                        </CardItem>
+                        <CardItem style={StyleSheet.flatten(styles.card)}>
+                            <Icon style={StyleSheet.flatten(styles.icon)} name="md-female" />
+                            <Text>
+                                {this.state.dog.height.female.min} - {this.state.dog.height.female.max} cm
+                            </Text>
+                        </CardItem>
+                   </Card>
+                   <Card style={StyleSheet.flatten(styles.cardContainer)}>
+                        <CardItem header style={StyleSheet.flatten(styles.card)}>
+                            <Text style={StyleSheet.flatten(styles.title)}>Weight</Text>
+                        </CardItem>
+                        <CardItem style={StyleSheet.flatten(styles.card)}>
+                            <Icon style={StyleSheet.flatten(styles.icon)} name="md-male" />
+                            <Text>
+                                {this.state.dog.weight.male.min} - {this.state.dog.weight.male.max} kg
+                            </Text>
+                        </CardItem>
+                        <CardItem style={StyleSheet.flatten(styles.card)}>
+                            <Icon style={StyleSheet.flatten(styles.icon)} name="md-female" />
+                            <Text>
+                                {this.state.dog.weight.female.min} - {this.state.dog.weight.female.max} kg
+                            </Text>
+                        </CardItem>
+                   </Card>
+                   <Card style={StyleSheet.flatten(styles.cardContainer)}>
+                        <CardItem header style={StyleSheet.flatten(styles.card)}>
+                            <Text style={StyleSheet.flatten(styles.title)}>Life span</Text>
+                        </CardItem>
+                        <CardItem style={StyleSheet.flatten(styles.card)}>
+                            <Icon style={StyleSheet.flatten(styles.icon)} name="md-pulse" />
+                            <Text>
+                                {this.state.dog.lifeSpan.min} - {this.state.dog.lifeSpan.max} years
+                            </Text>
+                        </CardItem>
+                        
+                   </Card>
+
+                    
 
                 </Content>
+               
                    
             </Container>
             
@@ -73,31 +142,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5FCFF',
-    paddingTop: 80
+    paddingTop: 55
   },
-  welcome: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#00BCD4'
-  },
-  t_title: {
-    fontSize: 24,
-    color: '#fff',
-    fontWeight: 'bold',
+  fullImage: {
+    alignSelf: 'stretch',
+    height: deviceHeight / 2.5,
+    width: deviceWidth,
+    position: 'relative',
+    marginBottom: 10,
   },
   header: {
-  	backgroundColor: '#009688'
+    padding: 20
   },
-  headerSection: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingLeft: 20,
-    paddingRight: 20
+  card: {
+      backgroundColor: '#F5FCFF',
   },
-  headerIcon: {
-    color: '#fff',
+  title: {
+      fontWeight: 'bold',
+      fontSize: 20
+  },
+  cardContainer: {
+      marginLeft: 20,
+      marginRight: 20,
+      marginTop: 10
+  },
+  icon : {
+      color: '#009688',
   }
 });
 
