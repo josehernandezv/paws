@@ -114,7 +114,7 @@ class formAddNewPet extends Component {
                             <Text> Male</Text>
                         </ListItem>
                         <ListItem > 
-                            <Radio selected={!this.state.option} onPress={() => this.setState({option:this.state.option})}/>
+                            <Radio selected={!this.state.option} onPress={() => this.setState({option:!this.state.option})}/>
                             <Text> Female</Text>
                         </ListItem>
 
