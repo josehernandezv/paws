@@ -37,8 +37,10 @@ import {
     Input,
     InputGroup,
     Title,
-    Textarea
+    Textarea,
+    Radio
 } from 'native-base';
+
 
 const firebase = require('../database/firebase')
 
@@ -50,7 +52,9 @@ class formAddNewPet extends Component {
         this.state ={
             name:'',
             age:'',
-            weight:''
+            weight:'',
+            option: true,
+            sex: ''
         };
         
     }
@@ -65,20 +69,37 @@ class formAddNewPet extends Component {
     }
 
     addPet(){
+
+        if(this.state.option){
+            this.state.sex = "male"
+        } else {
+            this.state.sex = "female"
+        }
         
         if(this.state.name !== '' & this.state.age !== '' & this.state.weight !== ''){
             firebase.database().ref('pets').push({ 
                 name: this.state.name,
                 age: this.state.age,
-                weight: this.state.weight
+                weight: this.state.weight,
+                breed: this.passProps.animal.breed,
+                sex: this.state.sex                
             });
-            this.setState({
+            
+        }
+        this.setState({
                 name:'',
                 age:'',
                 weight:''
-            });
-        }
+        });
     }
+
+    validate(email, password) {
+        return {
+            email: email.length === 0,
+            password: password.length === 0,
+        };
+    }
+    
 
     render() {
         return (
@@ -88,19 +109,28 @@ class formAddNewPet extends Component {
 
                     <Form>
 
-						<Item floatingLabel>
+                        <ListItem >
+                            <Radio selected={this.state.option} onPress={() =>this.setState({option:!this.state.option})}/>
+                            <Text> Male</Text>
+                        </ListItem>
+                        <ListItem > 
+                            <Radio selected={!this.state.option} onPress={() => this.setState({option:this.state.option})}/>
+                            <Text> Female</Text>
+                        </ListItem>
+
+						<Item floatingLabel >
 							<Label>Name</Label>
-							<Input onChangeText={(text) => this.setState({name:text})}/>
+							<Input onChangeText={(text) => this.setState({name:text})} />
 						</Item>
 
-                        <Item floatingLabel>
+                        <Item floatingLabel >
 							<Label>Age</Label>
-							<Input keyboardType="numeric" onChangeText={(text) => this.setState({age:text})}/>
+							<Input keyboardType="numeric" onChangeText={(text) => this.setState({age:text})} />
 						</Item>
 
-                        <Item floatingLabel>
+                        <Item floatingLabel >
 							<Label>Weight</Label>
-							<Input keyboardType="numeric" onChangeText={(text) => this.setState({weight:text})}/>
+							<Input keyboardType="numeric" onChangeText={(text) => this.setState({weight:text})} />
 						</Item>
                     
                     	<Button full rounded style={StyleSheet.flatten(styles.add_button)}
@@ -159,7 +189,17 @@ const styles = StyleSheet.create({
 		color: '#fff',
 		fontSize: 16
 	},
-    
+    title: {
+    fontSize: 18
+  },
+  description: {
+    fontSize: 14,
+    color: 'gray'
+  },
+  error: {
+    borderColor: 'red'
+  }
+  
 });
 
 module.exports = formAddNewPet;
