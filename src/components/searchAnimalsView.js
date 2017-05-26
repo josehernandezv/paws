@@ -42,7 +42,9 @@ class searchAnimalsView extends Component {
             filteredAnimals: [],
             searchingDogs: true
         };
-        
+    }
+
+    componentDidMount() {
         this.getDogs();
     }
 
@@ -166,7 +168,7 @@ class searchAnimalsView extends Component {
     pressed(animal){
         this.props.navigator.push({
             name: 'Details',
-            tittle: animal.breed,
+            title: animal.breed,
             passProps: {animal: animal}
         });
     }
@@ -237,8 +239,7 @@ const styles = StyleSheet.create({
       backgroundColor: '#F5FCFF'
   },
   footerButton: {
-    backgroundColor: '#F5FCFF',
-    color: '#000'
+    backgroundColor: '#F5FCFF'
   },
   inactive: {
     color: '#90A4AE'
