@@ -59,7 +59,11 @@ const datas = [
     route: '',
     icon: 'md-settings',
   },
-
+  {
+    name: 'Log out',
+    route: 'Login',
+    icon: 'md-log-out',
+  },
 ];
 
 
@@ -120,6 +124,7 @@ class mainView extends Component {
                             </Right>
                             }*/}
                         </ListItem>}
+                        
                     />
                    
                 </Content>
