@@ -8,38 +8,34 @@ import {
     Image,
     StatusBar,
     Alert,
-    TouchableWithoutFeedback,
-    DatePickerAndroid,
     TextInput
 } from 'react-native';
 
 import { 
     Container,
     Content,
-    Drawer,
-    Header,
     Button,
     Icon,
-    Footer,
-    FooterTab,
-    Badge,
-    List,
-    ListItem,
-    Thumbnail,
     Body,
     Toast,
-    Fab,
     Right,
     Left,
     Form,
     Item,
     Label,
     Input,
+    Thumbnail,
     InputGroup,
     Title,
     Textarea,
     Radio
 } from 'native-base';
+
+import {
+     Col,
+     Row,
+     Grid
+} from 'react-native-easy-grid'
 
 
 const firebase = require('../database/firebase')
@@ -51,10 +47,19 @@ class formAddNewPet extends Component {
         this.passProps = this.props.route.passProps,
         this.state ={
             name:'',
-            age:'',
+            ageYears:'',
+            ageMonths:'',
             weight:'',
+            height:'',
             option: true,
-            sex: ''
+            gender: '',
+            isValid: false,
+            nameError: false,
+            ageYearsError: false,
+            ageMonthsError: false,
+            weightError: false,
+            heightError: false, 
+            genderError: false
         };
         
     }
@@ -71,19 +76,28 @@ class formAddNewPet extends Component {
     addPet(){
 
         if(this.state.option){
-            this.state.sex = "male"
+            this.state.gender = "male"
         } else {
-            this.state.sex = "female"
+            this.state.gender = "female"
         }
         
-        if(this.state.name !== '' & this.state.age !== '' & this.state.weight !== ''){
+        if(this.state.name !== ''){
             firebase.database().ref('pets').push({ 
                 name: this.state.name,
-                age: this.state.age,
+                age: {
+                    years: this.state.ageYears,
+                    months: this.state.ageMonths,
+                },
                 weight: this.state.weight,
-                breed: this.passProps.animal.breed,
-                sex: this.state.sex                
+                height: this.state.height,
+                breed: this.passProps.animal.key,
+                gender: this.state.gender                
             });
+            Alert.alert('Success', this.state.name + ' has been added to your pets!',
+            [
+              {text: 'OK', onPress: () => {  		
+                this.props.navigator.popToTop()}}
+            ]);
             
         }
         this.setState({
@@ -99,6 +113,12 @@ class formAddNewPet extends Component {
             password: password.length === 0,
         };
     }
+
+    checkName() {
+        if (this.state.name == '') {
+            this.setState({nameError: true})
+        }
+    }
     
 
     render() {
@@ -109,29 +129,84 @@ class formAddNewPet extends Component {
 
                     <Form>
 
-                        <ListItem >
-                            <Radio selected={this.state.option} onPress={() =>this.setState({option:!this.state.option})}/>
-                            <Text> Male</Text>
-                        </ListItem>
-                        <ListItem > 
-                            <Radio selected={!this.state.option} onPress={() => this.setState({option:!this.state.option})}/>
-                            <Text> Female</Text>
-                        </ListItem>
-
-						<Item floatingLabel >
+                        <Item floatingLabel error={this.state.nameError}>
 							<Label>Name</Label>
-							<Input onChangeText={(text) => this.setState({name:text})} />
+							<Input
+                            onBlur={() => this.checkName()} 
+                            onChangeText={(text) => this.setState({name:text})} />
 						</Item>
 
-                        <Item floatingLabel >
-							<Label>Age</Label>
-							<Input keyboardType="numeric" onChangeText={(text) => this.setState({age:text})} />
-						</Item>
+                        
+                        <Grid style={{margin: 10}}>
+                            <Row style={{marginBottom: 10}}>
+                                <Label style={{color: '#455A64'}}> Gender </Label>
+                            </Row>
+                            <Row>
+                                <Col style={{flexDirection: 'row'}}>
+                                    <Radio selected={this.state.option} onPress={() =>this.setState({option:!this.state.option})}/>
+                                    <Text> Male</Text>
+                                </Col>
+                                <Col style={{flexDirection: 'row'}}>
+                                    <Radio selected={!this.state.option} onPress={() => this.setState({option:!this.state.option})}/>
+                                    <Text> Female</Text>
+                                </Col>
+                            </Row>
+                        </Grid>
+                        <Grid>
+                            <Row style={{marginLeft: 10, marginTop: 20, marginBottom: 0}}>
+                                <Label style={{color: '#455A64'}}> Age </Label>
+                            </Row>
+                            <Row>
+                                <Col>
+                                    <Item inlineLabel >
+                                        <Label>Years</Label>
+                                        <Input keyboardType="numeric" onChangeText={(text) => this.setState({ageYears:text})} />
+                                    </Item>
+                                </Col>
+                                <Col>
+                                    <Item inlineLabel >
+                                        <Label>Months</Label>
+                                        <Input keyboardType="numeric" onChangeText={(text) => this.setState({ageMonths:text})} />
+                                    </Item>
+                                </Col>
+                            </Row>
+                        </Grid>
 
-                        <Item floatingLabel >
-							<Label>Weight</Label>
-							<Input keyboardType="numeric" onChangeText={(text) => this.setState({weight:text})} />
-						</Item>
+                        <Grid>
+                            <Row>
+                                <Col>
+                                    <Item floatingLabel >
+                                        <Label>Weight</Label>
+                                        <Input keyboardType="numeric" onChangeText={(text) => this.setState({weight:text})} />
+                                    </Item>
+                                </Col>
+                                <Col style={{paddingTop:50}}>
+                                    <Label> kg </Label>
+                                </Col>
+                            </Row>
+                        </Grid>
+
+                        <Grid>
+                            <Row>
+                                <Col>
+                                    <Item floatingLabel >
+                                        <Label>Height</Label>
+                                        <Input keyboardType="numeric" onChangeText={(text) => this.setState({height:text})} />
+                                    </Item>
+                                </Col>
+                                <Col style={{paddingTop:50}}>
+                                    <Label> cm </Label>
+                                </Col>
+                            </Row>
+                        </Grid>
+                        
+
+                        <Button iconLeft rounded style={StyleSheet.flatten(styles.add_button)}>
+                            <Icon name='md-camera' />
+                            <Text style={StyleSheet.flatten(styles.button_text)}>Add a photo</Text>
+                        </Button>
+
+                        <Thumbnail style={{margin: 10, height: 100, width: 100}}square source={require('../images/akita.jpg')} />
                     
                     	<Button full rounded style={StyleSheet.flatten(styles.add_button)}
                     		onPress ={() => this.addPet()}>
@@ -151,18 +226,9 @@ class formAddNewPet extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
     backgroundColor: '#F5FCFF',
-    paddingTop: 80
-  },
-  welcome: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#00BCD4'
-  },
-  t_title: {
-    fontSize: 24,
-    color: '#fff',
-    fontWeight: 'bold',
+    paddingTop: 60
   },
   header: {
   	backgroundColor: '#009688'
@@ -179,7 +245,6 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   add_button: {
-		fontSize: 16,
 		marginLeft: 10,
 		marginRight: 10,
 		marginTop: 10,

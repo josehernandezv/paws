@@ -58,7 +58,6 @@ class dogsDescriptionView extends Component {
                           this.props.navigator.push({
                             name: 'FormAddPet',
                             title: 'Add new Pet',
-                            passProps: {animal: this.passProps.animal},
                             passProps: {
                                 animal: this.state.dog
                             }

@@ -103,10 +103,6 @@ class searchAnimalsView extends Component {
         this.setState({searchingDogs: true});
         try {
             firebase.database().ref("animals/dogs").orderByChild("breed").once("value",function(snapshot) {
-                self.setState({
-                    dogs: snapshot.val()
-                })
-
 
                 var dogs = [];
                 snapshot.forEach(function(child) {
