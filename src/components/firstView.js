@@ -4,7 +4,8 @@ import React, { Component } from 'react';
 import {
     View,
     Text,
-    StyleSheet
+    StyleSheet,
+    AsyncStorage 
 } from 'react-native';
 
 import { 
@@ -18,9 +19,32 @@ class firstView extends Component {
     constructor(props) {
         super(props);
         this.state = { 
-            user: this.props.route.passProps.user
+            user: {
+                username: '',
+                email: '',
+                id: ''
+            }
         };
+        this.getUser()
     }
+
+    componentDidMount() {
+        
+        this.getUser().done()
+    }
+
+    async getUser() {
+        try {
+            const value = await AsyncStorage.getItem('@PawsStore:user');
+            console.log(value)
+            if (value !== null){
+                var user = JSON.parse(value)
+                this.setState({user})
+            }
+        } catch (error) {
+        }
+    }
+    
 
     render() {
         return (

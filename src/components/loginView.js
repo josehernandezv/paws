@@ -6,7 +6,8 @@ import {
     Text,
     StyleSheet,
     Image,
-    StatusBar
+    StatusBar,
+    AsyncStorage
 } from 'react-native';
 
 import { 
@@ -49,14 +50,24 @@ class loginView extends Component {
         try {
             await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
             firebase.database().ref("users").orderByChild("email").equalTo(this.state.email).on("child_added",function(snapshot) {
-                 self.props.navigator.replace({
-                    name: 'Main',
-                    passProps: { user: snapshot.val()} 
-                });
+                 self.redirectHome(snapshot.val());
             });
         } catch (error) {
             self.showToast(error.message);
         }
+    }
+
+    async redirectHome(user) {
+        try {
+            await AsyncStorage.setItem('@PawsStore:user', JSON.stringify(user));
+            this.props.navigator.replace({
+                name: 'Main',
+                passProps: { user: user} 
+            });
+        } catch (error) {
+            this.showToast(error.message)
+        }
+
     }
 
     async facebookLogin() {
@@ -74,6 +85,11 @@ class loginView extends Component {
                                     email: profile.email,
                                     username: profile.name
                                 }} 
+                            });
+                            self.redirectHome({
+                                id: snapshot.key,
+                                email: profile.email,
+                                username: profile.name
                             });
                         }).catch(function(error) {
                             self.showToast(error);
@@ -100,12 +116,11 @@ class loginView extends Component {
             if (snapshot.exists()) {
                 var credential = firebase.auth.GoogleAuthProvider.credential(user.idToken);
                 firebase.auth().signInWithCredential(credential).then(function() {
-                    self.props.navigator.replace({
-                        name: 'Main',
-                        passProps: { user: {
-                            email: user.email,
-                            username: user.givenName
-                        }} 
+                    console.log(snapshot.val())
+                    self.redirectHome({
+                        id: snapshot.val().id,
+                        email: user.email,
+                        username: user.givenName
                     });
                 }).catch(function(error) {
                     self.showToast(error.message)
