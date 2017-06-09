@@ -6,7 +6,8 @@ import {
     Text,
     StyleSheet,
     Image,
-    StatusBar
+    StatusBar,
+    AsyncStorage
 } from 'react-native';
 
 import { 
@@ -57,13 +58,11 @@ class signupView extends Component {
                         email: this.state.email,
                         username: this.state.username
                     });
-                    self.props.navigator.replace({
-                        name: 'Main',
-                        passProps: { user: {
-                            email: this.state.email,
-                            username: this.state.name
-                        }} 
-                    });                  
+                    self.redirectHome({
+                        id:  firebase.auth().currentUser.uid,
+                        email: this.state.email,
+                        username: this.state.username
+                    })                
                 } catch (error) {
                     self.showToast(error.message)
                 }             
@@ -99,13 +98,12 @@ class signupView extends Component {
                                     email: profile.email,
                                     username: profile.first_name
                                 });
-                                self.props.navigator.replace({
-                                    name: 'Main',
-                                    passProps: { user: {
-                                        email: profile.email,
-                                        username: profile.first_name
-                                    }} 
-                                });              
+                                self.redirectHome({
+                                    id:  firebase.auth().currentUser.uid,
+                                    email: profile.email,
+                                    username: profile.first_name
+                                })
+                                             
                             } catch (error) {
                                 self.showToast(error.message)
                             }             
@@ -152,13 +150,12 @@ class signupView extends Component {
                             email: user.email,
                             username: user.givenName
                         });
-                        self.props.navigator.replace({
-                            name: 'Main',
-                            passProps: { user: {
-                                email: user.email,
-                                username: user.givenName
-                            }} 
-                        });              
+                        self.redirectHome({
+                            id:  firebase.auth().currentUser.uid,
+                            email: user.email,
+                            username: user.givenName
+                        });
+                                     
                     } catch (error) {
                         self.showToast(error.message)
                     }             
@@ -167,6 +164,19 @@ class signupView extends Component {
         }).catch(function(error) {
             self.showToast(error);
         });
+    }
+
+    async redirectHome(user) {
+        try {
+            await AsyncStorage.setItem('@PawsStore:user', JSON.stringify(user));
+            this.props.navigator.replace({
+                name: 'Main',
+                passProps: { user: user} 
+            });
+        } catch (error) {
+            this.showToast(error.message)
+        }
+
     }
 
     render() {
