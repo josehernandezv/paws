@@ -33,12 +33,12 @@ const deviceHeight = Dimensions.get('window').height;
 const deviceWidth = Dimensions.get('window').width;
 const firebase = require('../database/firebase')
 
-class dogsDescriptionView extends Component {
+class animalsDescriptionView extends Component {
 
     constructor(props) {
         super(props);
         this.passProps = this.props.route.passProps
-        this.state = {dog: this.passProps.animal}
+        this.state = {animal: this.passProps.animal}
     }
 
 
@@ -48,22 +48,22 @@ class dogsDescriptionView extends Component {
              <Container style={StyleSheet.flatten(styles.container)}>
                 
 
-                    <Image source={{uri: this.state.dog.imgUrl}} style={styles.fullImage}/>
+                    <Image source={{uri: this.state.animal.imgUrl}} style={styles.fullImage}/>
                     
                     <View style={styles.header}>
-                        <H1>{this.state.dog.breed}</H1>
-                        <Text note>Dog</Text>
+                        <H1>{this.state.animal.breed}</H1>
+                        <Text note>{this.state.animal.specie}</Text>
                          <Fab active={true} style={{ backgroundColor: '#009688'}} position="topRight"
-                      onPress={() => {
-                          this.props.navigator.push({
-                            name: 'FormAddPet',
-                            title: 'Add new Pet',
-                            passProps: {
-                                animal: this.state.dog
-                            }
-                      })}}>
-                          <Icon name="md-add" />
-                    </Fab>
+                            onPress={() => {
+                                this.props.navigator.push({
+                                    name: 'FormAddPet',
+                                    title: 'Add new Pet',
+                                    passProps: {
+                                        animal: this.state.animal
+                                    }
+                            })}}>
+                                <Icon name="md-add" />
+                         </Fab>
                     </View>
                     <Content>
                     <Card style={StyleSheet.flatten(styles.cardContainer)}>
@@ -72,7 +72,7 @@ class dogsDescriptionView extends Component {
                         </CardItem>
                         <CardItem style={StyleSheet.flatten(styles.card)}>
                             <Body>
-                                <Text>{this.state.dog.description}</Text>
+                                <Text>{this.state.animal.description}</Text>
                             </Body>
                         </CardItem>
                    </Card>
@@ -84,13 +84,13 @@ class dogsDescriptionView extends Component {
                         <CardItem style={StyleSheet.flatten(styles.card)}>
                             <Icon style={StyleSheet.flatten(styles.icon)} name="md-male" />
                             <Text>
-                                {this.state.dog.height.male.min} - {this.state.dog.height.male.max} cm
+                                {this.state.animal.height.male.min} - {this.state.animal.height.male.max} cm
                             </Text>
                         </CardItem>
                         <CardItem style={StyleSheet.flatten(styles.card)}>
                             <Icon style={StyleSheet.flatten(styles.icon)} name="md-female" />
                             <Text>
-                                {this.state.dog.height.female.min} - {this.state.dog.height.female.max} cm
+                                {this.state.animal.height.female.min} - {this.state.animal.height.female.max} cm
                             </Text>
                         </CardItem>
                    </Card>
@@ -101,13 +101,13 @@ class dogsDescriptionView extends Component {
                         <CardItem style={StyleSheet.flatten(styles.card)}>
                             <Icon style={StyleSheet.flatten(styles.icon)} name="md-male" />
                             <Text>
-                                {this.state.dog.weight.male.min} - {this.state.dog.weight.male.max} kg
+                                {this.state.animal.weight.male.min} - {this.state.animal.weight.male.max} kg
                             </Text>
                         </CardItem>
                         <CardItem style={StyleSheet.flatten(styles.card)}>
                             <Icon style={StyleSheet.flatten(styles.icon)} name="md-female" />
                             <Text>
-                                {this.state.dog.weight.female.min} - {this.state.dog.weight.female.max} kg
+                                {this.state.animal.weight.female.min} - {this.state.animal.weight.female.max} kg
                             </Text>
                         </CardItem>
                    </Card>
@@ -118,7 +118,7 @@ class dogsDescriptionView extends Component {
                         <CardItem style={StyleSheet.flatten(styles.card)}>
                             <Icon style={StyleSheet.flatten(styles.icon)} name="md-pulse" />
                             <Text>
-                                {this.state.dog.lifeSpan.min} - {this.state.dog.lifeSpan.max} years
+                                {this.state.animal.lifeSpan.min} - {this.state.animal.lifeSpan.max} years
                             </Text>
                         </CardItem>
                         
@@ -170,4 +170,4 @@ const styles = StyleSheet.create({
   }
 });
 
-module.exports = dogsDescriptionView;
+module.exports = animalsDescriptionView;

@@ -14,21 +14,19 @@ import {
 import { 
     Container,
     Content,
-    Drawer,
     Text,
-    Header,
     Button,
+    Input,
     Icon,
     Footer,
     FooterTab,
-    Badge,
     List,
     ListItem,
     Thumbnail,
     Body,
     Toast,
     Item,
-    Input
+    Spinner 
 } from 'native-base';
 
 const firebase = require('../database/firebase');
@@ -40,12 +38,13 @@ class searchAnimalsView extends Component {
         this.state = {
             animals: [],
             filteredAnimals: [],
-            searchingDogs: true
+            searchingDogs: true,
+            isLoaded: false
         };
     }
 
     componentDidMount() {
-        this.getDogs();
+        this.getAnimals('dogs');
     }
 
     showToast(message) {
@@ -57,39 +56,39 @@ class searchAnimalsView extends Component {
         })
     }
 
-     insertAnimal(){
+    insertAnimal(){
         var self = this;
         try {
             var newAnimal = firebase.database().ref("animals/dogs/").push();
 
             newAnimal.set({
-                specie: 'dog',
-                breed: '',
-                description: '',
+                specie: 'Dog',
+                breed: 'Chihuahua',
+                description: 'The Chihuahua is the smallest breed of dog and is named for the state of Chihuahua in Mexico. Chihuahuas come in a wide variety of sizes, head shapes, colors, and coat lengths. The Chihuahua is a tiny but confident dog that loves giving and receiving attention. Despite its petite and fragile appearance, the breed is quite bold and can even be considered brazen. Its wide eyes and big ears are quite possibly its best-known features.',
                 height: {
                     female: {
-                        min: 55,
-                        max: 60
+                        min: 15.2,
+                        max: 20.3
                     },
                     male: {
-                        min: 60,
-                        max: 65
+                        min: 15.2,
+                        max: 22.9
                     }
                 },
-                imgUrl: '',
+                imgUrl: 'https://fthmb.tqn.com/zy2PrI9CvR8f98_RBMVX8y_gL_w=/960x0/filters:no_upscale()/about/twenty20_f84c633e-705e-4bf8-a724-00cdea750d8d-590b51893df78c92837b18d6.jpg',
                 lifeSpan: {
-                    min: 9,
-                    max: 13
+                    min: 15,
+                    max: 20
                 },
-                reference: '',
+                reference: "https://en.wikipedia.org/wiki/Chihuahua_(dog)",
                 weight: {
                     female: {
-                        min: 22,
-                        max: 32
+                        min: 1.5,
+                        max: 3
                     },
                     male: {
-                        min: 30,
-                        max: 40
+                        min: 1.5,
+                        max: 3
                     }
                 }
             });
@@ -98,15 +97,15 @@ class searchAnimalsView extends Component {
         }
     }
 
-    getDogs() {
+    getAnimals(specie) {
         var self = this;
-        this.setState({searchingDogs: true});
+        this.setState({searchingDogs: (specie == 'dogs'), isLoaded:false});
         try {
-            firebase.database().ref("animals/dogs").orderByChild("breed").once("value",function(snapshot) {
+            firebase.database().ref("animals/" + specie).orderByChild("breed").once("value",function(snapshot) {
 
-                var dogs = [];
+                var animals = [];
                 snapshot.forEach(function(child) {
-                dogs.push({
+                animals.push({
                         key: child.key,
                         specie: child.val().specie,
                         breed: child.val().breed,
@@ -118,7 +117,7 @@ class searchAnimalsView extends Component {
                             },
                             male: {
                                 min: child.val().height.male.min,
-                                max: child.val().height.male.min
+                                max: child.val().height.male.max
                             }
                         },
                         imgUrl: child.val().imgUrl,
@@ -139,28 +138,13 @@ class searchAnimalsView extends Component {
                         }
                     })
                 });
-                self.setState({animals: dogs, filteredAnimals: dogs});
-
-
-            });
-        } catch (error) {
-            self.showToast(error.message);
-        }
-    }
-
-    getCats(){
-        var self = this;
-        this.setState({searchingDogs: false});        
-        try {
-            firebase.database().ref("animals/cats").once("value", function(snapshot){
-                self.setState({animals: snapshot.val(), filteredAnimals: snapshot.val()})
+                self.setState({animals: animals, filteredAnimals: animals, isLoaded:true});
             });
         } catch (error) {
             self.showToast(error.message);
         }
     }
   
-
     pressed(animal){
         this.props.navigator.push({
             name: 'Details',
@@ -178,8 +162,17 @@ class searchAnimalsView extends Component {
         this.setState({filteredAnimals: filteredAnimals})
     }
 
+    renderLoadingView() {
+        return (
+            <Container style={StyleSheet.flatten(styles.container)}>
+                <Content>
+                    <Spinner color='#009688' />
+                </Content>
+            </Container>
+        );
+    }
+
     render() {
-        var self = this;
         return (
              <Container style={StyleSheet.flatten(styles.container)}>
                 <Content>
@@ -188,6 +181,7 @@ class searchAnimalsView extends Component {
                         <Input placeholder="Search" onChangeText={(searchText) => this.filter(searchText)}/>
                     </Item>
                     
+                    {!this.state.isLoaded ? this.renderLoadingView() : null}
                     <List dataArray={this.state.filteredAnimals} renderRow={animal =>
                         <ListItem onPress={() => this.pressed(animal)}>
                             <Thumbnail square style={StyleSheet.flatten(styles.thumbnail)} source={{uri: animal.imgUrl}} />
@@ -199,15 +193,17 @@ class searchAnimalsView extends Component {
                         </ListItem>
                          }
                     />
+
+
                 </Content>
                     <Footer>
                         <FooterTab style={StyleSheet.flatten(styles.footer)}>
-                            <Button style={StyleSheet.flatten(styles.footerButton)} onPress={() => this.getDogs()} active={this.state.searchingDogs}>
+                            <Button style={StyleSheet.flatten(styles.footerButton)} onPress={() => this.getAnimals('dogs')} active={this.state.searchingDogs}>
                                 <Text style={this.state.searchingDogs ? StyleSheet.flatten(styles.active) : StyleSheet.flatten(styles.inactive)}>
                                     Dogs
                                 </Text>
                             </Button>
-                            <Button style={StyleSheet.flatten(styles.footerButton)} onPress={() => this.getCats()} active={!this.state.searchingDogs}>
+                            <Button style={StyleSheet.flatten(styles.footerButton)} onPress={() => this.getAnimals('cats')} active={!this.state.searchingDogs}>
                                 <Text style={!this.state.searchingDogs ? StyleSheet.flatten(styles.active) : StyleSheet.flatten(styles.inactive)}>
                                     Cats
                                 </Text>

@@ -20,7 +20,6 @@ const Navigator = require('./node_modules/react-native-deprecated-custom-compone
 const Login = require('./src/components/loginView');
 const SignUp = require('./src/components/signupView');
 const Main = require('./src/components/mainView');
-const Details = require('./src/components/dogsDescriptionView');
 console.ignoredYellowBox = ['Setting a timer'];
 
 export default class Paws extends Component {
@@ -38,10 +37,6 @@ export default class Paws extends Component {
       case 'Main':
         return (
           <Main {...route.props} navigator={navigator} route={route}></Main>
-        );
-      case 'Details':
-        return(
-          <Details {...route.props} navigator={navigator} route={route}></Details>
         );
     }
   }

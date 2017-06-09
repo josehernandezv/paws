@@ -75,7 +75,7 @@ class loginView extends Component {
         FBLoginManager.loginWithPermissions(['email'], (error, data) => {
             if (!error) {
                 var profile = JSON.parse(data.profile);
-                firebase.database().ref("users").orderByChild("email").equalTo(profile.email).once("value").then(function(snapshot) {
+                firebase.database().ref("users").orderByChild("email").equalTo(profile.email).on("child_added",function(snapshot) {
                     if (snapshot.exists()) {
                         const credential = firebase.auth.FacebookAuthProvider.credential(data.credentials.token);
                         firebase.auth().signInWithCredential(credential).then(function() {
@@ -112,13 +112,12 @@ class loginView extends Component {
         });
         const user = await GoogleSignIn.signInPromise();
 
-        firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("value").then(function(snapshot) {
+        firebase.database().ref("users").orderByChild("email").equalTo(user.email).on("child_added", function(snapshot) {
             if (snapshot.exists()) {
                 var credential = firebase.auth.GoogleAuthProvider.credential(user.idToken);
                 firebase.auth().signInWithCredential(credential).then(function() {
-                    console.log(snapshot.val())
                     self.redirectHome({
-                        id: snapshot.val().id,
+                        id: snapshot.key,
                         email: user.email,
                         username: user.givenName
                     });
