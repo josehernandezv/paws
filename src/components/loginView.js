@@ -79,13 +79,6 @@ class loginView extends Component {
                     if (snapshot.exists()) {
                         const credential = firebase.auth.FacebookAuthProvider.credential(data.credentials.token);
                         firebase.auth().signInWithCredential(credential).then(function() {
-                            self.props.navigator.replace({
-                                name: 'Main',
-                                passProps: { user: {
-                                    email: profile.email,
-                                    username: profile.name
-                                }} 
-                            });
                             self.redirectHome({
                                 id: snapshot.key,
                                 email: profile.email,
