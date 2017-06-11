@@ -50,6 +50,11 @@ const datas = [
     icon: 'md-paw',
   },
   {
+    name: 'Notifications',
+    route: 'Notifications',
+    icon: 'md-notifications',
+  },
+  {
     name: 'Account',
     route: '',
     icon: 'md-contact',

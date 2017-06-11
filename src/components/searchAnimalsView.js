@@ -5,10 +5,6 @@ import {
     View,
     StyleSheet,
     Image,
-    StatusBar,
-    Alert,
-    TouchableHighlight,
-    TextInput
 } from 'react-native';
 
 import { 
@@ -180,10 +176,6 @@ class searchAnimalsView extends Component {
         return (
              <Container style={StyleSheet.flatten(styles.container)}>
                 <Content>
-                    
-                    <View>
-                        <Text>Prueba de usuario:{this.state.user}</Text>
-                    </View>
                     
                     <Item searchBar rounded style={{marginLeft: 10, marginRight: 10, marginBottom: 20, backgroundColor: '#fff'}} >
                         <Icon name="md-search" style={{ color: 'gray'}}/>

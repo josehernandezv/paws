@@ -30,6 +30,7 @@ const MedicalRecords = require('./medicalRecordsView');
 const FormMedicalRecord = require('./formMedicalRecordView');
 const IndividualMedicalRecord = require('./individualMedicalRecordView');
 const FormAddPet = require('./formAddNewPet');
+const Notifications = require('./notificationsView');
 
 class mainView extends Component {
 
@@ -81,6 +82,10 @@ class mainView extends Component {
             case 'FormAddPet':
                 return(
                     <FormAddPet {...route.props} navigator={navigator} route={route}></FormAddPet>
+                );
+            case 'Notifications':
+                return(
+                    <Notifications {...route.props} navigator={navigator} route={route}></Notifications>
                 );
         }
         
