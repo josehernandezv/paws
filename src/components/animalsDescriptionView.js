@@ -46,7 +46,9 @@ class animalsDescriptionView extends Component {
         var self = this;
         return (
              <Container style={StyleSheet.flatten(styles.container)}>
-                
+
+                    
+                    
 
                     <Image source={{uri: this.state.animal.imgUrl}} style={styles.fullImage}/>
                     

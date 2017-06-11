@@ -40,6 +40,7 @@ class searchAnimalsView extends Component {
             filteredAnimals: [],
             searchingDogs: true,
             isLoaded: false
+            
         };
     }
 
@@ -162,6 +163,8 @@ class searchAnimalsView extends Component {
         this.setState({filteredAnimals: filteredAnimals})
     }
 
+    
+
     renderLoadingView() {
         return (
             <Container style={StyleSheet.flatten(styles.container)}>
@@ -171,11 +174,17 @@ class searchAnimalsView extends Component {
             </Container>
         );
     }
+    
 
     render() {
         return (
              <Container style={StyleSheet.flatten(styles.container)}>
                 <Content>
+                    
+                    <View>
+                        <Text>Prueba de usuario:{this.state.user}</Text>
+                    </View>
+                    
                     <Item searchBar rounded style={{marginLeft: 10, marginRight: 10, marginBottom: 20, backgroundColor: '#fff'}} >
                         <Icon name="md-search" style={{ color: 'gray'}}/>
                         <Input placeholder="Search" onChangeText={(searchText) => this.filter(searchText)}/>

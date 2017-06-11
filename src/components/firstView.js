@@ -5,7 +5,8 @@ import {
     View,
     Text,
     StyleSheet,
-    AsyncStorage 
+    AsyncStorage,
+    Alert
 } from 'react-native';
 
 import { 
@@ -42,6 +43,7 @@ class firstView extends Component {
                 this.setState({user})
             }
         } catch (error) {
+            
         }
     }
     
@@ -52,6 +54,7 @@ class firstView extends Component {
                 <Content>
                     <Text style={styles.welcome}>
                         Welcome {this.state.user.username}
+                        
                     </Text>
                 </Content>
             </Container>

@@ -81,7 +81,7 @@ class formAddNewPet extends Component {
             this.state.gender = "female"
         }
         
-        if(this.state.name !== ''){
+        if(this.state.name !== '' && this.state.years !== '' && this.state.months !== '' && this.state.weight !== ''){
             firebase.database().ref('pets').push({ 
                 name: this.state.name,
                 age: {
@@ -99,6 +99,8 @@ class formAddNewPet extends Component {
                 this.props.navigator.popToTop()}}
             ]);
             
+        } else {
+            Alert.alert("Debe ingresar los datos");
         }
         this.setState({
                 name:'',
@@ -114,8 +116,14 @@ class formAddNewPet extends Component {
         };
     }
 
+    validarCampos(numero){
+        if(!/^([0-9])*$/.test(numero)){
+            Alert.alert("Debe ingresar números");
+        }
+    }
+
     checkName() {
-        if (this.state.name == '') {
+        if (this.state.name == '' || this.state.years == '' || this.state.months == '' || this.state.weight == '') {
             this.setState({nameError: true})
         }
     }
@@ -158,15 +166,17 @@ class formAddNewPet extends Component {
                             </Row>
                             <Row>
                                 <Col>
-                                    <Item inlineLabel >
+                                    <Item inlineLabel floatingLabel error={this.state.nameError}>
                                         <Label>Years</Label>
-                                        <Input keyboardType="numeric" onChangeText={(text) => this.setState({ageYears:text})} />
+                                        
+                                        <Input onChange={() => this.validarCampos(this.state.ageYears)} onBlur={() => this.checkName()} keyboardType="numeric" onChangeText={(text) => this.setState({ageYears:text})} />
+                                        
                                     </Item>
                                 </Col>
                                 <Col>
-                                    <Item inlineLabel >
+                                    <Item inlineLabel floatingLabel error={this.state.nameError}>
                                         <Label>Months</Label>
-                                        <Input keyboardType="numeric" onChangeText={(text) => this.setState({ageMonths:text})} />
+                                        <Input onChange={() => this.validarCampos(this.state.ageMonths)} onBlur={() => this.checkName()} keyboardType="numeric" onChangeText={(text) => this.setState({ageMonths:text})} />
                                     </Item>
                                 </Col>
                             </Row>
@@ -175,9 +185,9 @@ class formAddNewPet extends Component {
                         <Grid>
                             <Row>
                                 <Col>
-                                    <Item floatingLabel >
+                                    <Item floatingLabel error={this.state.nameError}>
                                         <Label>Weight</Label>
-                                        <Input keyboardType="numeric" onChangeText={(text) => this.setState({weight:text})} />
+                                        <Input onChange={() => this.validarCampos(this.state.weight)} onBlur={() => this.checkName()} keyboardType="numeric" onChangeText={(text) => this.setState({weight:text})} />
                                     </Item>
                                 </Col>
                                 <Col style={{paddingTop:50}}>
@@ -191,7 +201,7 @@ class formAddNewPet extends Component {
                                 <Col>
                                     <Item floatingLabel >
                                         <Label>Height</Label>
-                                        <Input keyboardType="numeric" onChangeText={(text) => this.setState({height:text})} />
+                                        <Input onChange={() => this.validarCampos(this.state.height)} keyboardType="numeric" onChangeText={(text) => this.setState({height:text})} />
                                     </Item>
                                 </Col>
                                 <Col style={{paddingTop:50}}>

@@ -23,7 +23,8 @@ export default class formMedicalRecordView extends Component {
 				details: '',
 				simpleDate: new Date(),
 				simpleText: 'Pick a date',
-				isUpdate: false
+				isUpdate: false,
+				nameError: false
 			};
 		} else {
 			this.state = { 
@@ -52,28 +53,35 @@ export default class formMedicalRecordView extends Component {
     addRecord () {
     	var self = this;
         try {
-        	var newRecord = firebase.database().ref("medicalRecords").push();
-            newRecord.set({
-                 title: this.state.title,
-                 date: this.state.simpleText,
-                 details: this.state.details,
-            });
-        	Alert.alert('Success', 'Medical record successfully added!',
-            [
-              {text: 'OK', onPress: () => {
-						self.props.route.refreshList()		  		
-				  		self.props.navigator.replace({
-                            name: 'IndividualMedicalRecord',
-                            title: 'Medical Record',
-                            passProps: {record: {
-								title: this.state.title,
-								date: this.state.simpleText,
-								details: this.state.details,
-								key: newRecord.key
-							}}
-                        })}}
-            ]
-          );
+
+			if(this.state.title !== ''){
+				var newRecord = firebase.database().ref("medicalRecords").push();
+				newRecord.set({
+					title: this.state.title,
+					date: this.state.simpleText,
+					details: this.state.details,
+				});
+				Alert.alert('Success', 'Medical record successfully added!',
+				[
+				{text: 'OK', onPress: () => {
+							self.props.route.refreshList()		  		
+							self.props.navigator.replace({
+								name: 'IndividualMedicalRecord',
+								title: 'Medical Record',
+								passProps: {record: {
+									title: this.state.title,
+									date: this.state.simpleText,
+									details: this.state.details,
+									key: newRecord.key
+								}}
+							})}}
+				]
+			);
+			} else {
+				Alert.alert("Debe ingresar los datos");
+			}
+
+        	
         } catch (error) {
             self.showToast(error.message);
         }
@@ -124,6 +132,13 @@ export default class formMedicalRecordView extends Component {
 		}
 	};
 
+	checkData() {
+        if (this.state.title == '' || this.state.date == '' || this.state.details == '') {
+            this.setState({nameError: true})
+        }
+    }
+
+
 	render() {
 		return (
 			<Container>
@@ -132,9 +147,9 @@ export default class formMedicalRecordView extends Component {
 
 					<Form>
 
-						<Item floatingLabel={!this.state.isUpdate} stackedLabel={this.state.isUpdate}>
+						<Item floatingLabel={!this.state.isUpdate} stackedLabel={this.state.isUpdate} error={this.state.nameError}>
 							<Label>Title</Label>
-							<Input onChangeText={(title) => this.setState({title})} value={this.state.title}/>
+							<Input onBlur={() => this.checkData()} onChangeText={(title) => this.setState({title})} value={this.state.title}/>
 						</Item>
 
 						<TouchableWithoutFeedback
@@ -215,7 +230,10 @@ const styles = StyleSheet.create({
 		marginLeft: 10,
 		padding: 10,
 		color: '#565656',
-	}
+	},
+	error: {
+    	borderColor: 'red'
+  	}
 });
 
 module.exports = formMedicalRecordView;
