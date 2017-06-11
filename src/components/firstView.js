@@ -4,10 +4,9 @@ import React, { Component } from 'react';
 import {
     View,
     StyleSheet,
-    AsyncStorage,
-    Alert,
     Image,
     Dimensions,
+    AsyncStorage 
 } from 'react-native';
 
 import { 
@@ -53,7 +52,6 @@ class firstView extends Component {
                 this.setState({user})
             }
         } catch (error) {
-            
         }
     }
     
@@ -62,12 +60,6 @@ class firstView extends Component {
         return (
             <Container style={StyleSheet.flatten(styles.container)}>
                 <Content>
-<<<<<<< HEAD
-                    <Text style={styles.welcome}>
-                        Welcome {this.state.user.username}
-                        
-                    </Text>
-=======
                     <Card style={{ flex: 0 }}>
                         <CardItem>
                             <Left>
@@ -92,7 +84,6 @@ class firstView extends Component {
                             </Body>
                         </CardItem>
                    </Card>
->>>>>>> c84b46f813ae24d823a1e52fc9dd23a900c18e3c
                 </Content>
             </Container>
         );
