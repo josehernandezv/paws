@@ -35,18 +35,15 @@ class firstView extends Component {
                 id: ''
             }
         };
-        this.getUser()
     }
 
     componentDidMount() {
-        
         this.getUser().done()
     }
 
     async getUser() {
         try {
             const value = await AsyncStorage.getItem('@PawsStore:user');
-            console.log(value)
             if (value !== null){
                 var user = JSON.parse(value)
                 this.setState({user})

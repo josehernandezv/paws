@@ -8,7 +8,8 @@ import {
     Image,
     StatusBar,
     Alert,
-    TextInput
+    TextInput,
+    AsyncStorage 
 } from 'react-native';
 
 import { 
@@ -59,9 +60,31 @@ class formAddNewPet extends Component {
             ageMonthsError: false,
             weightError: false,
             heightError: false, 
-            genderError: false
+            genderError: false,
+            user: {
+                username: '',
+                email: '',
+                id: ''
+            },
+            // imgUrl:  this.passProps.animal.specie == 'Dog' ? '../images/dog_shape.jpg' : '../images/cat_shape.jpg'
+            imgUrl:  this.passProps.animal.imgUrl
         };
         
+    }
+
+    componentDidMount() {
+        this.getUser().done()
+    }
+
+    async getUser() {
+        try {
+            const value = await AsyncStorage.getItem('@PawsStore:user');
+            if (value !== null){
+                var user = JSON.parse(value)
+                this.setState({user: user})
+            }
+        } catch (error) {
+        }
     }
 
     showToast(message) {
@@ -83,6 +106,7 @@ class formAddNewPet extends Component {
         
         if(this.state.name !== '' && this.state.years !== '' && this.state.months !== '' && this.state.weight !== ''){
             firebase.database().ref('pets').push({ 
+                userId: this.state.user.id,
                 name: this.state.name,
                 age: {
                     years: this.state.ageYears,
@@ -90,8 +114,9 @@ class formAddNewPet extends Component {
                 },
                 weight: this.state.weight,
                 height: this.state.height,
-                breed: this.passProps.animal.key,
-                gender: this.state.gender                
+                breedId: this.passProps.animal.key,
+                gender: this.state.gender,
+                imgUrl: this.state.imgUrl         
             });
             Alert.alert('Success', this.state.name + ' has been added to your pets!',
             [
@@ -216,7 +241,7 @@ class formAddNewPet extends Component {
                             <Text style={StyleSheet.flatten(styles.button_text)}>Add a photo</Text>
                         </Button>
 
-                        <Thumbnail style={{margin: 10, height: 100, width: 100}}square source={require('../images/akita.jpg')} />
+                        <Image style={{margin: 10, height: 100, width: 100}} source={{uri: this.state.imgUrl}} />
                     
                     	<Button full rounded style={StyleSheet.flatten(styles.add_button)}
                     		onPress ={() => this.addPet()}>
