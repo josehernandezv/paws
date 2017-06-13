@@ -104,7 +104,8 @@ class formAddNewPet extends Component {
         }
         
         if(this.state.name !== '' && this.state.years !== '' && this.state.months !== '' && this.state.weight !== ''){
-            firebase.database().ref('pets').push({ 
+            var newPet = firebase.database().ref('pets').push();
+            newPet.set({ 
                 userId: this.state.user.id,
                 name: this.state.name,
                 age: {
@@ -117,6 +118,18 @@ class formAddNewPet extends Component {
                 gender: this.state.gender,
                 imgUrl: this.state.imgUrl         
             });
+
+            firebase.database().ref('notifications').push({
+                petId: newPet.key,
+                userId: this.state.user.id,
+                nutrition: false,
+                medical: false,
+                hair: false,
+                bath: false,
+                physical: false,
+                digestive: false
+            })
+
             Alert.alert('Success', this.state.name + ' has been added to your pets!',
             [
               {text: 'OK', onPress: () => {  	
@@ -127,7 +140,7 @@ class formAddNewPet extends Component {
             ]);
             
         } else {
-            Alert.alert("Debe ingresar los datos");
+            Alert.alert("Error", "All the fields are required");
         }
         this.setState({
                 name:'',
