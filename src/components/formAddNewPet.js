@@ -97,7 +97,6 @@ class formAddNewPet extends Component {
     }
 
     addPet(){
-
         if(this.state.option){
             this.state.gender = "male"
         } else {
@@ -120,8 +119,11 @@ class formAddNewPet extends Component {
             });
             Alert.alert('Success', this.state.name + ' has been added to your pets!',
             [
-              {text: 'OK', onPress: () => {  		
-                this.props.navigator.popToTop()}}
+              {text: 'OK', onPress: () => {  	
+                this.props.refreshMenu();	
+                this.props.navigator.popToTop()
+                
+              }}
             ]);
             
         } else {

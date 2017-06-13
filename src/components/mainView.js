@@ -88,7 +88,7 @@ class mainView extends Component {
                 );
             case 'FormAddPet':
                 return(
-                    <FormAddPet {...route.props} navigator={navigator} route={route}></FormAddPet>
+                    <FormAddPet {...route.props} navigator={navigator} route={route} refreshMenu={this.refreshSideBar.bind(this)} ></FormAddPet>
                 );
             case 'Notifications':
                 return(
@@ -166,12 +166,16 @@ class mainView extends Component {
         this.drawer._root.open()
     }
 
+    refreshSideBar() {
+        this.refs.sideBar.refresh();
+    }
+
     render() {
         var self = this;
         return (
              <Drawer
                 ref={(ref) => { this.drawer = ref; }}
-                content={<SideBar close={this.closeDrawer.bind(this)} navigator={this.getNavigator.bind(this)} />}
+                content={<SideBar ref='sideBar' close={this.closeDrawer.bind(this)} navigator={this.getNavigator.bind(this)} />}
                 onClose={() => this.closeDrawer()} >
 
                 <StatusBar backgroundColor="#00796B" barStyle="light-content"/>
@@ -179,7 +183,7 @@ class mainView extends Component {
                 <Navigator ref="navigator"
                     style={{backgroundColor: '#fff'}}
                     initialRoute={{name:'First', title: 'Paws', passProps: {user: self.state.user}}}
-                    renderScene={this.renderScene}
+                    renderScene={this.renderScene.bind(this)}
                     configureScene={(route) => {
                         if(route.sceneConfig) {
                             return route.sceneConfig;

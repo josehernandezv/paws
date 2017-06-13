@@ -122,6 +122,12 @@ class mainView extends Component {
         this.getData().done()
     }
 
+    async refresh() {
+        console.log('refreshing')
+        this.setState({isLoaded:false})
+        await this.getData();
+    }
+
     async getData() {
         var user = {};
         var pets = [];
@@ -159,19 +165,6 @@ class mainView extends Component {
            }            
 
         });
-
-        // console.log(pets)
-
-        // currentPet = pets[0]
-        // console.log(pets[0])
-        // var fruits = ['Apple', 'Banana'];
-        // fruits.push['aaa']
-        // console.log(fruits[0])
-        // console.log(currentPet)
-        
-        
-
-        // this.setState({user: user, currentPet:currentPet})
     }
 
     async changeCurrentPet(pet) {
