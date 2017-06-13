@@ -31,6 +31,13 @@ const FormMedicalRecord = require('./formMedicalRecordView');
 const IndividualMedicalRecord = require('./individualMedicalRecordView');
 const FormAddPet = require('./formAddNewPet');
 const Notifications = require('./notificationsView');
+const Nutrition = require('./notifications/nutritionView');
+const Bath = require('./notifications/bathView');
+const MedicalCare = require('./notifications/medicalCareView');
+const PhysicalActivity = require('./notifications/physicalActivityView');
+const DigestiveNecessities = require('./notifications/digestiveNecessitiesView');
+const Hair = require('./notifications/hairCareView');
+
 
 class mainView extends Component {
 
@@ -86,6 +93,30 @@ class mainView extends Component {
             case 'Notifications':
                 return(
                     <Notifications {...route.props} navigator={navigator} route={route}></Notifications>
+                );
+            case 'Nutrition':
+                return(
+                    <Nutrition {...route.props} navigator={navigator} route={route}></Nutrition>
+                );
+            case 'Bath':
+                return(
+                    <Bath {...route.props} navigator={navigator} route={route}></Bath>
+                );
+            case 'MedicalCare':
+                return(
+                    <MedicalCare {...route.props} navigator={navigator} route={route}></MedicalCare>
+                );
+            case 'DigestiveNecessities':
+                return(
+                    <DigestiveNecessities {...route.props} navigator={navigator} route={route}></DigestiveNecessities>
+                );
+            case 'PhysicalActivity':
+                return(
+                    <PhysicalActivity {...route.props} navigator={navigator} route={route}></PhysicalActivity>
+                );
+            case 'Hair':
+                return(
+                    <Hair {...route.props} navigator={navigator} route={route}></Hair>
                 );
         }
         
