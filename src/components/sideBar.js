@@ -7,7 +7,7 @@ import {
     StyleSheet,
     Image,
     Dimensions,
-    TouchableHighlight,
+    TouchableWithoutFeedback ,
     AsyncStorage
 } from 'react-native';
 
@@ -30,7 +30,7 @@ import { Col, Row, Grid } from 'react-native-easy-grid';
 
 const deviceHeight = Dimensions.get('window').height;
 const deviceWidth = Dimensions.get('window').width;
-const datas = [
+const petsData = [
 //   {
 //     name: 'Header',
 //     route: 'header',
@@ -75,7 +75,28 @@ const datas = [
   },
 ];
 
-
+const noPetsData = [
+  {
+    name: 'Add new pet',
+    route: 'SearchAnimals',
+    icon: 'md-add-circle',
+  },
+  {
+    name: 'Account',
+    route: '',
+    icon: 'md-contact',
+  },
+  {
+    name: 'Settings',
+    route: '',
+    icon: 'md-settings',
+  },
+  {
+    name: 'Log out',
+    route: 'Login',
+    icon: 'md-log-out',
+  },
+];
 class mainView extends Component {
 
     constructor(props) {
@@ -92,7 +113,8 @@ class mainView extends Component {
                 imgUrl: ''
             },
             pets: [],
-            isLoaded: false
+            isLoaded: false,
+            hasPets: false,
         };
     }
 
@@ -113,22 +135,29 @@ class mainView extends Component {
         } catch (error) {
         }
 
-        await firebase.database().ref("pets").orderByChild("userId").equalTo(user.id).once("value",function(snapshot) {
+        await firebase.database().ref("pets").orderByChild("userId").equalTo(user.id).once("value",async function(snapshot) {
 
 
-           
             snapshot.forEach(function(child) {
                 var pet = child.val()
                 pet.id = child.key
                 pets.push(pet)
             });
 
-            currentPet = pets[0]
-            self.setState({user: user, currentPet:currentPet, isLoaded: true, pets : pets})
+           console.log(pets.length)
+           if (pets.length > 0) {
+               currentPet = pets.shift()
 
-            
-            
-            
+               try {
+                    await AsyncStorage.setItem('@PawsStore:pet', JSON.stringify(currentPet));
+                    self.setState({user: user, currentPet:currentPet, isLoaded: true, pets : pets, hasPets: true})  
+                } catch (error) {
+                }
+
+           } else {
+               self.setState({user: user, isLoaded: true, hasPets: false})
+           }            
+
         });
 
         // console.log(pets)
@@ -140,21 +169,22 @@ class mainView extends Component {
         // console.log(fruits[0])
         // console.log(currentPet)
         
-        // try {
-        //     const value = await AsyncStorage.getItem('@PawsStore:pet');
-        //     if (value !== null){
-        //         var user = JSON.parse(value)
-        //         this.setState({user})
-        //     }
-        // } catch (error) {
-        // }
+        
 
         // this.setState({user: user, currentPet:currentPet})
     }
 
-    changeCurrentPet(pet) {
-        this.setState({isLoaded:false})
-        this.setState({isLoaded:true,currentPet:pet})
+    async changeCurrentPet(pet) {
+        this.setState({isLoaded:false});
+        var pets = this.state.pets;
+        pets.push(this.state.currentPet);
+        var currentPet = pets.shift();
+
+        try {
+            await AsyncStorage.setItem('@PawsStore:pet', JSON.stringify(currentPet));
+            this.setState({isLoaded:true,currentPet:pet, pets:pets})
+        } catch (error) {
+        }
     }
 
     renderLoadingView() {
@@ -184,39 +214,42 @@ class mainView extends Component {
             <Container>
                 <Content bounces={false} style={{ flex: 1, backgroundColor: '#fff', top: -1 }}>
                     <Image source={require('../images/LoginBackground.jpg')} style={styles.drawerCover}>
-                        {/*<Image
-                        square
-                        style={styles.drawerImage}
-                        source={require('../images/Title.png')}
-                        />*/}
-                        <Grid>
-                            <Col>
-                                <Thumbnail large size={300} source={{uri: this.state.currentPet.imgUrl}} />     
-                            </Col>
-                            <Col>
-                                <View style={styles.otherPets}>
+                    
+                        {!this.state.hasPets && 
+                            <Image square style={styles.drawerImage} source={require('../images/Title.png')} />
+                        }
 
-                                    {this.state.pets.map(function(pet) {
-                                        return (
-                                            <TouchableHighlight onPress={() => this.changeCurrentPet(pet)}>
-                                                <View>
-                                                <Thumbnail small  source={{uri: pet.imgUrl}} style={StyleSheet.flatten(styles.petThumb)}/>
-                                                </View>
-                                            </TouchableHighlight>
-                                        )                                    
-                                    }.bind(this))}
-                                    {/*<List style={{flexDirection: 'row'}} dataArray={this.state.pets} renderRow={pet =>
-                                        <Thumbnail small  source={{uri: pet.imgUrl}} style={StyleSheet.flatten(styles.petThumb)} onPress={() => this.changeCurrentPet(pet)}/>     
-                                    }
-                                    />*/}
-                                </View>                  
-                            </Col>
-                        </Grid>
-                        <H1 style={{color: '#fff'}} >{this.state.currentPet.name}</H1>
+                        {this.state.hasPets &&
+                            <Content>
+                                <Grid>
+                                    <Col>
+                                        <Thumbnail large size={300} source={{uri: this.state.currentPet.imgUrl}} />     
+                                    </Col>
+                                    <Col>
+                                        <View style={styles.otherPets}>
+
+                                            {this.state.pets.map((pet) => 
+                                                    <TouchableWithoutFeedback  key={pet.id} onPress={() => this.changeCurrentPet(pet)} >
+                                                        <View>
+                                                            <Thumbnail small  source={{uri: pet.imgUrl}} style={StyleSheet.flatten(styles.petThumb)}/>
+                                                        </View>
+                                                    </TouchableWithoutFeedback >
+                                                                                
+                                            )}
+                                    
+                                        </View>                  
+                                    </Col>
+                                </Grid>
+                                <H1 style={{color: '#fff'}} >{this.state.currentPet.name}</H1>
+                            </Content>
+                        }
+                        
+
+                        
                     </Image>
 
                     <List
-                        dataArray={datas} renderRow={data =>
+                        dataArray={this.state.hasPets ? petsData : noPetsData} renderRow={data =>
                         <ListItem button noBorder onPress={() => this.navigate(data)} >
                             <Left>
                                 <Icon active name={data.icon} style={{ color: '#777', fontSize: 26, width: 30 }} />
