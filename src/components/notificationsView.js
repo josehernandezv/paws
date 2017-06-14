@@ -2,9 +2,9 @@
 
 import React, { Component } from 'react';
 
-import { Switch, Text, View, StyleSheet } from 'react-native';
+import { Switch, Text, View, StyleSheet, AsyncStorage } from 'react-native';
 
-import { Container, Content, List, ListItem, Thumbnail, Right, Left, Body, H4 } from 'native-base';
+import { Container, Content, List, ListItem, Thumbnail, Right, Left, Body, H4, Toast } from 'native-base';
 
 const Nutrition = require('./notifications/nutritionView');
 const Bath = require('./notifications/bathView');
@@ -13,25 +13,57 @@ const PhysicalActivity = require('./notifications/physicalActivityView');
 const DigestiveNecessities = require('./notifications/digestiveNecessitiesView');
 const Hair = require('./notifications/hairCareView');
 
+const firebase = require('../database/firebase');
 
 class notificationsView extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            trueSwitchIsOnNutrition: true,
             falseSwitchIsOnNutrition: false,
-            trueSwitchIsOnMedical: true,
             falseSwitchIsOnMedical: false,
-            trueSwitchIsOnPhysical: true,
             falseSwitchIsOnPhysical: false,
-            trueSwitchIsOnDigestive: true,
             falseSwitchIsOnDigestive: false,
-            trueSwitchIsOnHair: true,
             falseSwitchIsOnHair: false,
-            trueSwitchIsOnBath: true,
-            falseSwitchIsOnBath: false
+            falseSwitchIsOnBath: false,
+            pet: {}
         }
+    }
+
+    componentDidMount() {
+        this.getPet().done()
+    }
+
+    async getPet() {
+        try {
+            const value = await AsyncStorage.getItem('@PawsStore:pet');
+            if (value !== null){
+                var pet = JSON.parse(value)
+                this.setState({pet})
+            }
+        } catch (error) {
+        }
+    }
+
+    showToast(message) {
+        Toast.show({
+            supportedOrientations:['portrait','landscape'],
+            text: message,
+            position: 'bottom',
+            buttonText: 'Ok'
+        })
+    }
+
+    updateNotificationState(value, type) {
+
+        var self = this;
+        firebase.database().ref("notifications").orderByChild("petId").equalTo(self.state.pet.id).on("child_added",function(snapshot) {
+            console.log(snapshot.key)
+            firebase.database().ref("notifications/" + snapshot.key + "/" + type).set({
+                state: value
+            })
+        });
+        
     }
 
     render() {
@@ -55,9 +87,13 @@ class notificationsView extends Component {
             <Text note numberOfLines={2}>Range of hydration periods</Text>
             </Body>
             <Right>
-            <Switch onValueChange={(value) => this.setState({falseSwitchIsOnNutrition: value})}
+            <Switch onValueChange={(value) => {
+                this.updateNotificationState(value, 'nutrition')
+                this.setState({falseSwitchIsOnNutrition: value})
+            }}
             style={{marginBottom: 10}}
-            value={this.state.falseSwitchIsOnNutrition} />
+            value={this.state.falseSwitchIsOnNutrition}
+             />
             </Right>
             </ListItem>
 
@@ -75,7 +111,10 @@ class notificationsView extends Component {
             <Text note numberOfLines={2}>Schedule notificactions for your pet's checkups</Text>
             </Body>
             <Right>
-            <Switch onValueChange={(value) => this.setState({falseSwitchIsOnMedical: value})}
+            <Switch onValueChange={(value) => {
+                this.updateNotificationState(value, 'medical')
+                this.setState({falseSwitchIsOnMedical: value})
+            }}
             style={{marginBottom: 10}}
             value={this.state.falseSwitchIsOnMedical} />
             </Right>
@@ -95,7 +134,10 @@ class notificationsView extends Component {
             <Text note numberOfLines={2}>Allow your pet to release energy</Text>
             </Body>
             <Right>
-            <Switch onValueChange={(value) => this.setState({falseSwitchIsOnPhysical: value})}
+            <Switch onValueChange={(value) => {
+                this.updateNotificationState(value, 'physical')
+                this.setState({falseSwitchIsOnPhysical: value})
+            }}
             style={{marginBottom: 10}}
             value={this.state.falseSwitchIsOnPhysical} />
             </Right>
@@ -115,7 +157,10 @@ class notificationsView extends Component {
             <Text note numberOfLines={2}>Schedule potty rides</Text>
             </Body>
             <Right>
-            <Switch onValueChange={(value) => this.setState({falseSwitchIsOnDigestive: value})}
+            <Switch onValueChange={(value) => {
+                this.updateNotificationState(value, 'digestive')
+                this.setState({falseSwitchIsOnDigestive: value})
+            }}
             style={{marginBottom: 10}}
             value={this.state.falseSwitchIsOnDigestive} />
             </Right>
@@ -132,10 +177,13 @@ class notificationsView extends Component {
             </Left>
             <Body style={{marginLeft: -110}}>
             <Text style={{fontWeight: 'bold', fontSize: 17}}>Hair Care</Text>
-            <Text note numberOfLines={2}>Schedule hair hair routines on a range of periods</Text>
+            <Text note numberOfLines={2}>Schedule hair routines on a range of periods</Text>
             </Body>
             <Right>
-            <Switch onValueChange={(value) => this.setState({falseSwitchIsOnHair: value})}
+            <Switch onValueChange={(value) => {
+                this.updateNotificationState(value, 'hair')
+                this.setState({falseSwitchIsOnHair: value})
+            }}
             style={{marginBottom: 10}}
             value={this.state.falseSwitchIsOnHair} />
             </Right>
@@ -155,7 +203,10 @@ class notificationsView extends Component {
             <Text note numberOfLines={2}>Plan a bath schedule so your pet won't stink</Text>
             </Body>
             <Right>
-            <Switch onValueChange={(value) => this.setState({falseSwitchIsOnBath: value})}
+            <Switch onValueChange={(value) => {
+                this.updateNotificationState(value, 'bath')
+                this.setState({falseSwitchIsOnBath: value})
+            }}
             style={{marginBottom: 10}}
             value={this.state.falseSwitchIsOnBath} />
             </Right>

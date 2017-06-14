@@ -122,12 +122,12 @@ class formAddNewPet extends Component {
             firebase.database().ref('notifications').push({
                 petId: newPet.key,
                 userId: this.state.user.id,
-                nutrition: false,
-                medical: false,
-                hair: false,
-                bath: false,
-                physical: false,
-                digestive: false
+                nutrition: {state: false},
+                medical:  {state: false},
+                hair: {state: false},
+                bath: {state: false},
+                physical: {state: false},
+                digestive: {state: false}
             })
 
             Alert.alert('Success', this.state.name + ' has been added to your pets!',
