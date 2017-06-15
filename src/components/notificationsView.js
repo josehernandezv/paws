@@ -45,6 +45,8 @@ class notificationsView extends Component {
         }
     }
 
+    
+
     showToast(message) {
         Toast.show({
             supportedOrientations:['portrait','landscape'],
