@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 
-import { Switch, Text, View, StyleSheet, AsyncStorage } from 'react-native';
+import { Switch, Text, View, StyleSheet, AsyncStorage, Alert } from 'react-native';
 
 import { Container, Content, List, ListItem, Thumbnail, Right, Left, Body, H4, Toast } from 'native-base';
 
@@ -32,6 +32,38 @@ class notificationsView extends Component {
 
     componentDidMount() {
         this.getPet().done()
+        this.getNotificationState().done();
+    }
+
+    async getNotificationState(){
+        var self = this;
+        try {
+
+            firebase.database().ref("notifications").orderByChild("petId").once("value", function(snapshot){
+            snapshot.forEach(function(child){
+                //Alert.alert("adadsd " + child.key)
+                    child.key,
+                    self.setState({falseSwitchIsOnBath: child.val().bath.state}),
+                    self.setState({falseSwitchIsOnDigestive: child.val().digestive.state}),
+                    self.setState({falseSwitchIsOnHair: child.val().hair.state}),
+                    self.setState({falseSwitchIsOnMedical: child.val().medical.state}),
+                    self.setState({falseSwitchIsOnNutrition: child.val().nutrition.state}),
+                    self.setState({falseSwitchIsOnPhysical: child.val().physical.state})
+                    
+                    // this.state.falseSwitchIsOnBath = child.val().bath.state,
+                    // this.state.falseSwitchIsOnDigestive = child.val().digestive.state,
+                    // this.state.falseSwitchIsOnHair = child.val().hair.state,
+                    // this.state.falseSwitchIsOnMedical = child.val().medical.state,
+                    // this.state.falseSwitchIsOnNutrition = child.val().nutrition.state,
+                    // this.state.falseSwitchIsOnPhysical = child.val().physical.state
+                
+            });
+        });
+            
+        } catch (error) {
+            self.showToast(error.message);
+        }
+        
     }
 
     async getPet() {
@@ -108,7 +140,7 @@ class notificationsView extends Component {
             </Left>
             <Body style={{marginLeft: -110}}>
             <Text style={{fontWeight: 'bold', fontSize: 17}}>Medical Care</Text>
-            <Text note numberOfLines={2}>Schedule notificactions for your pet's checkups</Text>
+            <Text note numberOfLines={2}>Schedule notifications for your pet's checkups</Text>
             </Body>
             <Right>
             <Switch onValueChange={(value) => {
