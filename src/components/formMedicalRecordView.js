@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 
-import { View, Text, StyleSheet, DatePickerAndroid, TouchableWithoutFeedback, TextInput, Alert } 
+import { View, Text, StyleSheet, DatePickerAndroid, TouchableWithoutFeedback, TextInput, Alert, AsyncStorage } 
 from 'react-native';
 
 import { Container, Content, Header, Button, Title, Right, Left, Body, Icon, Form, Item,
@@ -24,7 +24,9 @@ export default class formMedicalRecordView extends Component {
 				simpleDate: new Date(),
 				simpleText: 'Pick a date',
 				isUpdate: false,
-				nameError: false
+				nameError: false,
+				userId: '',
+				petId: ''
 			};
 		} else {
 			this.state = { 
@@ -34,13 +36,35 @@ export default class formMedicalRecordView extends Component {
 				simpleDate: new Date(),
 				simpleText: record.date,
 				isUpdate: true,
-				key: record.key
+				key: record.key,
+				userId: record.userId,
+				petId: record.petId
 			};
 		}
-
-        
     }
 
+	componentDidMount() {
+		if (!this.state.isUpdate) {
+       		this.getData().done()
+		}
+    }
+
+	async getData() {
+		var userId = '';
+		var petId = '';
+		try {
+			var user = await AsyncStorage.getItem('@PawsStore:user');
+			if (user !== null){
+				userId = JSON.parse(user).id
+			}
+			var pet = await AsyncStorage.getItem('@PawsStore:pet');
+			if (pet !== null){
+				petId = JSON.parse(pet).id
+			}
+		} catch (error) {
+		}
+		this.setState({userId: userId, petId: petId})
+	}
     showToast(message) {
         Toast.show({
             supportedOrientations:['portrait','landscape'],
@@ -60,6 +84,8 @@ export default class formMedicalRecordView extends Component {
 					title: this.state.title,
 					date: this.state.simpleText,
 					details: this.state.details,
+					userId: this.state.userId,
+					petId: this.state.petId
 				});
 				Alert.alert('Success', 'Medical record successfully added!',
 				[
@@ -78,7 +104,7 @@ export default class formMedicalRecordView extends Component {
 				]
 			);
 			} else {
-				Alert.alert("Debe ingresar los datos");
+				Alert.alert("Error", "All the fields are required");
 			}
 
         	
@@ -95,6 +121,8 @@ export default class formMedicalRecordView extends Component {
                  title: this.state.title,
                  date: this.state.simpleText,
                  details: this.state.details,
+				 userId: this.state.userId,
+				 petId: this.state.petId
             });
         	Alert.alert('Success', 'Medical record successfully edited!',
             [
