@@ -50,7 +50,7 @@ const petsData = [
   },
   {
     name: 'My pets',
-    route: '',
+    route: 'MyPets',
     icon: 'md-paw',
   },
   {

@@ -37,7 +37,7 @@ const MedicalCare = require('./notifications/medicalCareView');
 const PhysicalActivity = require('./notifications/physicalActivityView');
 const DigestiveNecessities = require('./notifications/digestiveNecessitiesView');
 const Hair = require('./notifications/hairCareView');
-
+const MyPets = require('./myPetsView');
 
 class mainView extends Component {
 
@@ -117,6 +117,10 @@ class mainView extends Component {
             case 'Hair':
                 return(
                     <Hair {...route.props} navigator={navigator} route={route}></Hair>
+                );
+            case 'MyPets':
+                return(
+                    <MyPets {...route.props} navigator={navigator} route={route}></MyPets>
                 );
         }
         
