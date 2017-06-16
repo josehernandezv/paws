@@ -38,8 +38,32 @@ import {
      Grid
 } from 'react-native-easy-grid'
 
+import RNFetchBlob from 'react-native-fetch-blob'
+
 
 const firebase = require('../database/firebase')
+const ImagePicker = require('react-native-image-picker');
+const Blob = RNFetchBlob.polyfill.Blob
+const Fetch = RNFetchBlob.polyfill.Fetch
+window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+window.Blob = Blob
+window.fetch = new Fetch({
+    auto : true,
+    binaryContentTypes : [
+        'image/',
+        'video/',
+        'audio/',
+        'foo/',
+    ]
+}).build()
+
+const options = {
+  title: 'Select pet picture',
+  storageOptions: {
+    skipBackup: true,
+    path: 'images'
+  }
+};
 
 class formAddNewPet extends Component {
 
@@ -104,49 +128,49 @@ class formAddNewPet extends Component {
         }
         
         if(this.state.name !== '' && this.state.years !== '' && this.state.months !== '' && this.state.weight !== ''){
-            var newPet = firebase.database().ref('pets').push();
-            newPet.set({ 
-                userId: this.state.user.id,
-                name: this.state.name,
-                age: {
-                    years: this.state.ageYears,
-                    months: this.state.ageMonths,
-                },
-                weight: this.state.weight,
-                height: this.state.height,
-                breedId: this.passProps.animal.key,
-                gender: this.state.gender,
-                imgUrl: this.state.imgUrl         
-            });
-
-            firebase.database().ref('notifications').push({
-                petId: newPet.key,
-                userId: this.state.user.id,
-                nutrition: {state: false},
-                medical:  {state: false},
-                hair: {state: false},
-                bath: {state: false},
-                physical: {state: false},
-                digestive: {state: false}
-            })
-
-            Alert.alert('Success', this.state.name + ' has been added to your pets!',
-            [
-              {text: 'OK', onPress: () => {  	
-                this.props.refreshMenu();	
-                this.props.navigator.popToTop()
-                
-              }}
-            ]);
             
+
+            this.savePicture(this.state.imgUrl).then(function(data) {
+                console.log(data)
+
+                var newPet = firebase.database().ref('pets').push();
+                newPet.set({ 
+                    userId: this.state.user.id,
+                    name: this.state.name,
+                    age: {
+                        years: this.state.ageYears,
+                        months: this.state.ageMonths,
+                    },
+                    weight: this.state.weight,
+                    height: this.state.height,
+                    breedId: this.passProps.animal.key,
+                    gender: this.state.gender,
+                    imgUrl: data         
+                });
+
+                firebase.database().ref('notifications').push({
+                    petId: newPet.key,
+                    userId: this.state.user.id,
+                    nutrition: {state: false},
+                    medical:  {state: false},
+                    hair: {state: false},
+                    bath: {state: false},
+                    physical: {state: false},
+                    digestive: {state: false}
+                })
+
+                Alert.alert('Success', this.state.name + ' has been added to your pets!',
+                [
+                    {text: 'OK', onPress: () => {  	
+                        this.props.navigator.popToTop()
+                        this.props.refreshMenu();	
+                    }}
+                ]);
+            }.bind(this))
+                        
         } else {
             Alert.alert("Error", "All the fields are required");
         }
-        this.setState({
-                name:'',
-                age:'',
-                weight:''
-        });
     }
 
     validate(email, password) {
@@ -167,8 +191,74 @@ class formAddNewPet extends Component {
             this.setState({nameError: true})
         }
     }
-    
 
+    takePicture() {
+        ImagePicker.showImagePicker(options, (response) => {
+            console.log('Response = ', response);
+
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            }
+            else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            }
+            else if (response.customButton) {
+                console.log('User tapped custom button: ', response.customButton);
+            }
+            else {
+                this.setState({
+                    imgUrl: response.uri
+                });
+            }
+        });
+    }
+
+    savePicture(uri) {
+        return new Promise((resolve, reject) => {
+            const sessionId = new Date().getTime()
+            var uploadBlob = null;
+            const imageRef = firebase.storage().ref('images').child(`${sessionId}`)
+
+            if (uri.substring(0,4) == 'http') {
+                RNFetchBlob.config({ fileCache : true }).fetch('GET', uri).then((resp) => {
+                    let rnfbURI = RNFetchBlob.wrap(resp.path())
+                    return Blob.build(rnfbURI, { type : 'image/jpg;'})
+                }).then((blob) => {
+                    uploadBlob = blob;
+                    return imageRef.put(blob, { contentType : 'image/jpg' })
+                }).then(() => {
+                    uploadBlob.close()
+                    return imageRef.getDownloadURL()
+                }).then((url) => {
+                    resolve(url)
+                    console.log(url)
+                })
+                .catch((error) => {
+                    reject(error)
+                })
+            } else {
+                RNFetchBlob.fs.readFile(uri, 'base64')
+                .then((data) => {
+                    return Blob.build(data, { type: `${'application/octet-stream'};BASE64` })
+                })
+                .then((blob) => {
+                    uploadBlob = blob
+                    return imageRef.put(blob, { contentType: 'application/octet-stream' })
+                })
+                .then(() => {
+                    uploadBlob.close()
+                    return imageRef.getDownloadURL()
+                })
+                .then((url) => {
+                    resolve(url)
+                })
+                .catch((error) => {
+                    reject(error)
+                })
+            }
+        })
+    }
+    
     render() {
         return (
              <Container style={StyleSheet.flatten(styles.container)}>
@@ -251,7 +341,8 @@ class formAddNewPet extends Component {
                         </Grid>
                         
 
-                        <Button iconLeft rounded style={StyleSheet.flatten(styles.add_button)}>
+                        <Button iconLeft rounded style={StyleSheet.flatten(styles.add_button)}
+                            onPress={() => this.takePicture()}>
                             <Icon name='md-camera' />
                             <Text style={StyleSheet.flatten(styles.button_text)}>Add a photo</Text>
                         </Button>

@@ -2,10 +2,10 @@
 
 import React, { Component } from 'react';
 
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, AsyncStorage } from 'react-native';
 
-import { Container, Content, List, Item, ListItem, CheckBox, Header, 
-	Button, Title, Right, Left, Body, Icon, Footer, Input, Fab, Toast } 
+import { Container, Content, List, Item, ListItem, 
+	Button, Title, Right, Left, Body, Icon, Input, Fab, Toast, Spinner } 
     from 'native-base';
 
     const FormMedicalRecord = require('./formMedicalRecordView');
@@ -17,7 +17,8 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
             super(props);
             this.state = {
                 records: [],
-                filteredRecords: []
+                filteredRecords: [],
+                isLoaded: false
             };
         }
 
@@ -35,23 +36,33 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
         }
 
         refresh() {
-            this.getRecords();
+            this.getRecords().done();
         }
 
-        getRecords () {
+        async getRecords () {
+            var userId = '';
+            var petId = '';
+            try {
+                var user = await AsyncStorage.getItem('@PawsStore:user');
+                if (user !== null){
+                    userId = JSON.parse(user).id
+                }
+                var pet = await AsyncStorage.getItem('@PawsStore:pet');
+                if (pet !== null){
+                    petId = JSON.parse(pet).id
+                }
+            } catch (error) {
+            }
             var self = this;
             try {
-                firebase.database().ref("medicalRecords").orderByChild("date").once("value",function(snapshot) {
+                firebase.database().ref("medicalRecords").orderByChild("petId").equalTo(petId).once("value",function(snapshot) {
                      var records = [];
                      snapshot.forEach(function(child) {
-                        records.push({
-                            title: child.val().title,
-                            details: child.val().details,
-                            date: child.val().date,
-                            key: child.key
-                        })
+                        var record = child.val()
+                        record.key = child.key;
+                        records.push(record)
                      });
-                     self.setState({records: records, filteredRecords: records});
+                     self.setState({records: records, filteredRecords: records, isLoaded: true});
 
                 });
             } catch (error) {
@@ -68,9 +79,18 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
             this.setState({filteredRecords: filteredRecords})
         }
 
-        
+        renderLoadingView() {
+            return (
+                <Container style={StyleSheet.flatten(styles.container)}>
+                    <Content>
+                        <Spinner color='#009688' />
+                    </Content>
+                </Container>
+            );
+        }
 
         render() {
+
             return (
                 <Container style={StyleSheet.flatten(styles.container)}>
                     <Content style={{ flex: 1 }} contentContainerStyle={{ flex: 1 }}>
@@ -80,6 +100,7 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
                         <Input placeholder="Search" onChangeText={(searchText) => this.filter(searchText)}/>
                     </Item>
 
+                     {!this.state.isLoaded ? this.renderLoadingView() : null}
                     <List dataArray={this.state.filteredRecords} renderRow={record => 
                         
                         <ListItem 
