@@ -69,8 +69,11 @@ class formAddNewPet extends Component {
 
     constructor(props) {
         super(props);
-        this.passProps = this.props.route.passProps,
-        this.state ={
+        this.passProps = this.props.route.passProps;
+        var pet = this.passProps.pet;
+
+        if ("undefined" === typeof pet) {
+            this.state ={
             name:'',
             ageYears:'',
             ageMonths:'',
@@ -85,6 +88,9 @@ class formAddNewPet extends Component {
             weightError: false,
             heightError: false, 
             genderError: false,
+            isNameEditable: true,
+            isGenderEditable: true,
+            isUpdate: false,
             user: {
                 username: '',
                 email: '',
@@ -93,7 +99,35 @@ class formAddNewPet extends Component {
             // imgUrl:  this.passProps.animal.specie == 'Dog' ? '../images/dog_shape.jpg' : '../images/cat_shape.jpg'
             imgUrl:  this.passProps.animal.imgUrl
         };
-        
+        } else {
+            this.state ={
+            name: pet.name,
+            id: pet.id,
+            ageYears: pet.age.years,
+            ageMonths: pet.age.months,
+            weight: pet.weight,
+            height: pet.height,
+            option: (pet.gender == 'male' ? true : false),
+            gender: pet.gender,
+            isValid: false,
+            nameError: false,
+            ageYearsError: false,
+            ageMonthsError: false,
+            weightError: false,
+            heightError: false, 
+            genderError: false,
+            isNameEditable: false,
+            isGenderEditable: false,
+            isUpdate: true,
+            user: {
+                username: '',
+                email: '',
+                id: ''
+            },
+            // imgUrl:  this.passProps.animal.specie == 'Dog' ? '../images/dog_shape.jpg' : '../images/cat_shape.jpg'
+            imgUrl:  pet.imgUrl
+        };
+        }
     }
 
     componentDidMount() {
@@ -131,41 +165,62 @@ class formAddNewPet extends Component {
             
 
             this.savePicture(this.state.imgUrl).then(function(data) {
-                console.log(data)
+                if (!this.state.isUpdate) {
+                    var newPet = firebase.database().ref('pets').push();
+                    newPet.set({ 
+                        userId: this.state.user.id,
+                        name: this.state.name,
+                        age: {
+                            years: this.state.ageYears,
+                            months: this.state.ageMonths,
+                        },
+                        weight: this.state.weight,
+                        height: this.state.height,
+                        breedId: this.passProps.animal.key,
+                        gender: this.state.gender,
+                        imgUrl: data         
+                    });
 
-                var newPet = firebase.database().ref('pets').push();
-                newPet.set({ 
-                    userId: this.state.user.id,
-                    name: this.state.name,
-                    age: {
-                        years: this.state.ageYears,
-                        months: this.state.ageMonths,
-                    },
-                    weight: this.state.weight,
-                    height: this.state.height,
-                    breedId: this.passProps.animal.key,
-                    gender: this.state.gender,
-                    imgUrl: data         
-                });
+                    firebase.database().ref('notifications').push({
+                        petId: newPet.key,
+                        userId: this.state.user.id,
+                        nutrition: {state: false},
+                        medical:  {state: false},
+                        hair: {state: false},
+                        bath: {state: false},
+                        physical: {state: false},
+                        digestive: {state: false}
+                    })
 
-                firebase.database().ref('notifications').push({
-                    petId: newPet.key,
-                    userId: this.state.user.id,
-                    nutrition: {state: false},
-                    medical:  {state: false},
-                    hair: {state: false},
-                    bath: {state: false},
-                    physical: {state: false},
-                    digestive: {state: false}
-                })
+                    Alert.alert('Success', this.state.name + ' has been added to your pets!',
+                    [
+                        {text: 'OK', onPress: () => {   
+                            this.props.navigator.popToTop()
+                            this.props.refreshMenu();   
+                        }}
+                    ]);    
+                } else {
+                    var pet = firebase.database().ref('pets/' + this.state.id);
+                    pet.update({ 
+                        age: {
+                            years: this.state.ageYears,
+                            months: this.state.ageMonths,
+                        },
+                        weight: this.state.weight,
+                        height: this.state.height,
+                        imgUrl: data         
+                    });
 
-                Alert.alert('Success', this.state.name + ' has been added to your pets!',
-                [
-                    {text: 'OK', onPress: () => {  	
-                        this.props.navigator.popToTop()
-                        this.props.refreshMenu();	
-                    }}
-                ]);
+                    Alert.alert('Success', this.state.name + ' has been edited!',
+                    [
+                        {text: 'OK', onPress: () => {   
+                            this.props.navigator.popToTop()
+                            this.props.refreshMenu();   
+                        }}
+                    ]);
+                }
+
+                
             }.bind(this))
                         
         } else {
@@ -267,11 +322,13 @@ class formAddNewPet extends Component {
 
                     <Form>
 
-                        <Item floatingLabel error={this.state.nameError}>
+                        <Item floatingLabel={this.state.isNameEditable} stackedLabel={!this.state.isNameEditable} error={this.state.nameError}>
 							<Label>Name</Label>
 							<Input
                             onBlur={() => this.checkName()} 
-                            onChangeText={(text) => this.setState({name:text})} />
+                            onChangeText={(text) => this.setState({name:text})} 
+                            editable={this.state.isNameEditable}
+                            value={this.state.name}/>
 						</Item>
 
                         
@@ -281,11 +338,13 @@ class formAddNewPet extends Component {
                             </Row>
                             <Row>
                                 <Col style={{flexDirection: 'row'}}>
-                                    <Radio selected={this.state.option} onPress={() =>this.setState({option:!this.state.option})}/>
+                                    <Radio selected={this.state.option} onPress={() =>this.setState({option:!this.state.option})}
+                                    disable={this.state.isGenderEditable} />
                                     <Text> Male</Text>
                                 </Col>
                                 <Col style={{flexDirection: 'row'}}>
-                                    <Radio selected={!this.state.option} onPress={() => this.setState({option:!this.state.option})}/>
+                                    <Radio selected={!this.state.option} onPress={() => this.setState({option:!this.state.option})}
+                                    disable={this.state.isGenderEditable}/>
                                     <Text> Female</Text>
                                 </Col>
                             </Row>
@@ -296,17 +355,19 @@ class formAddNewPet extends Component {
                             </Row>
                             <Row>
                                 <Col>
-                                    <Item inlineLabel floatingLabel error={this.state.nameError}>
+                                    <Item inlineLabel floatingLabel={this.state.isNameEditable} stackedLabel={!this.state.isNameEditable} error={this.state.nameError}>
                                         <Label>Years</Label>
                                         
-                                        <Input onChange={() => this.validarCampos(this.state.ageYears)} onBlur={() => this.checkName()} keyboardType="numeric" onChangeText={(text) => this.setState({ageYears:text})} />
+                                        <Input onChange={() => this.validarCampos(this.state.ageYears)} onBlur={() => this.checkName()} keyboardType="numeric" onChangeText={(text) => this.setState({ageYears:text})} 
+                                        value={this.state.ageYears}/>
                                         
                                     </Item>
                                 </Col>
                                 <Col>
-                                    <Item inlineLabel floatingLabel error={this.state.nameError}>
+                                    <Item inlineLabel floatingLabel={this.state.isNameEditable} stackedLabel={!this.state.isNameEditable} error={this.state.nameError}>
                                         <Label>Months</Label>
-                                        <Input onChange={() => this.validarCampos(this.state.ageMonths)} onBlur={() => this.checkName()} keyboardType="numeric" onChangeText={(text) => this.setState({ageMonths:text})} />
+                                        <Input onChange={() => this.validarCampos(this.state.ageMonths)} onBlur={() => this.checkName()} keyboardType="numeric" onChangeText={(text) => this.setState({ageMonths:text})} 
+                                        value={this.state.ageMonths}/>
                                     </Item>
                                 </Col>
                             </Row>
@@ -315,9 +376,10 @@ class formAddNewPet extends Component {
                         <Grid>
                             <Row>
                                 <Col>
-                                    <Item floatingLabel error={this.state.nameError}>
+                                    <Item floatingLabel={this.state.isNameEditable} stackedLabel={!this.state.isNameEditable} error={this.state.nameError}>
                                         <Label>Weight</Label>
-                                        <Input onChange={() => this.validarCampos(this.state.weight)} onBlur={() => this.checkName()} keyboardType="numeric" onChangeText={(text) => this.setState({weight:text})} />
+                                        <Input onChange={() => this.validarCampos(this.state.weight)} onBlur={() => this.checkName()} keyboardType="numeric" onChangeText={(text) => this.setState({weight:text})} 
+                                        value={this.state.weight}/>
                                     </Item>
                                 </Col>
                                 <Col style={{paddingTop:50}}>
@@ -329,9 +391,10 @@ class formAddNewPet extends Component {
                         <Grid>
                             <Row>
                                 <Col>
-                                    <Item floatingLabel >
+                                    <Item floatingLabel={this.state.isNameEditable} stackedLabel={!this.state.isNameEditable} >
                                         <Label>Height</Label>
-                                        <Input onChange={() => this.validarCampos(this.state.height)} keyboardType="numeric" onChangeText={(text) => this.setState({height:text})} />
+                                        <Input onChange={() => this.validarCampos(this.state.height)} keyboardType="numeric" onChangeText={(text) => this.setState({height:text})} 
+                                         value={this.state.height}/>
                                     </Item>
                                 </Col>
                                 <Col style={{paddingTop:50}}>
@@ -344,14 +407,14 @@ class formAddNewPet extends Component {
                         <Button iconLeft rounded style={StyleSheet.flatten(styles.add_button)}
                             onPress={() => this.takePicture()}>
                             <Icon name='md-camera' />
-                            <Text style={StyleSheet.flatten(styles.button_text)}>Add a photo</Text>
+                            <Text style={StyleSheet.flatten(styles.button_text)}>{this.state.isUpdate ? 'Change' : 'Add a'} photo</Text>
                         </Button>
 
                         <Image style={{margin: 10, height: 100, width: 100}} source={{uri: this.state.imgUrl}} />
                     
                     	<Button full rounded style={StyleSheet.flatten(styles.add_button)}
                     		onPress ={() => this.addPet()}>
-							<Text style={StyleSheet.flatten(styles.button_text)}>Add Pet</Text>
+							<Text style={StyleSheet.flatten(styles.button_text)}>{this.state.isUpdate ? 'Edit' : 'Add'} Pet</Text>
 						</Button>
 					
 					</Form>

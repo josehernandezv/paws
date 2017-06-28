@@ -11,7 +11,7 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
 
     import { Col, Row, Grid } from 'react-native-easy-grid';
 
- //   const formAddNewPet = require('./formAddNewPet');
+ const formAddNewPet = require('./formAddNewPet');
  const firebase = require('../database/firebase');
  const deviceWidth = Dimensions.get('window').width;
  const deviceHeight = Dimensions.get('window').height;
@@ -101,6 +101,12 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
 
      }
 
+     callback(args) {
+        this.setState({
+            pet: args
+        });
+    }
+
     render() {
         if (!this.state.isLoaded) {
             return this.renderLoadingView();
@@ -155,9 +161,7 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
                  onPress={() => this.props.navigator.push({
                      name: 'FormAddPet',
                      title: 'Edit Pet Info',
-                     passProps: {pet: pet},
-                     callback: this.callback.bind(this),
-                     refreshList: this.props.route.refreshList
+                     passProps: {pet: pet}
                  })}/>
                  </Button>
                    
