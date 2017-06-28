@@ -38,10 +38,12 @@ class notificationsView extends Component {
     async getNotificationState(){
         var self = this;
         try {
-
+            //Alert.alert("adadsd " + self.state.pet.id)
             firebase.database().ref("notifications").orderByChild("petId").once("value", function(snapshot){
             snapshot.forEach(function(child){
-                //Alert.alert("adadsd " + child.key)
+                if(self.state.pet.id !== 'undifined' && self.state.pet.id === child.val().petId){
+                    // Alert.alert("adadsd " + child.val().medical.state + " pet: " +child.val().petId)
+                    // Alert.alert("petid " + self.state.pet.id)
                     child.key,
                     self.setState({falseSwitchIsOnBath: child.val().bath.state}),
                     self.setState({falseSwitchIsOnDigestive: child.val().digestive.state}),
@@ -50,6 +52,8 @@ class notificationsView extends Component {
                     self.setState({falseSwitchIsOnNutrition: child.val().nutrition.state}),
                     self.setState({falseSwitchIsOnPhysical: child.val().physical.state})
                     
+                }
+                
                     // this.state.falseSwitchIsOnBath = child.val().bath.state,
                     // this.state.falseSwitchIsOnDigestive = child.val().digestive.state,
                     // this.state.falseSwitchIsOnHair = child.val().hair.state,
@@ -61,7 +65,7 @@ class notificationsView extends Component {
         });
             
         } catch (error) {
-            self.showToast(error.message);
+            
         }
         
     }
@@ -89,7 +93,7 @@ class notificationsView extends Component {
     }
 
     updateNotificationState(value, type) {
-
+        
         var self = this;
         firebase.database().ref("notifications").orderByChild("petId").equalTo(self.state.pet.id).on("child_added",function(snapshot) {
             console.log(snapshot.key)
