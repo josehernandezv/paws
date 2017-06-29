@@ -9,7 +9,8 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  AsyncStorage
 } from 'react-native';
 
 // import Navigator from 'react-native-deprecated-custom-components'
@@ -18,40 +19,36 @@ const Navigator = require('./node_modules/react-native-deprecated-custom-compone
 
 //components
 const Login = require('./src/components/loginView');
+const LoginMaster = require('./src/components/loginMaster');
 const SignUp = require('./src/components/signupView');
 const Main = require('./src/components/mainView');
 console.ignoredYellowBox = ['Setting a timer'];
 
 export default class Paws extends Component {
   
-  renderScene(route, navigator) {
-    switch (route.name) {
-      case 'Login':
-        return (
-          <Login {...route.props} navigator={navigator} route={route}></Login>
-        );
-      case 'Signup':
-        return (
-          <SignUp {...route.props} navigator={navigator} route={route}></SignUp>
-        );
-      case 'Main':
-        return (
-          <Main {...route.props} navigator={navigator} route={route}></Main>
-        );
+  constructor(props) {
+        super(props)
+        this.state = { 
+            user: null
+        };
     }
+
+  componentWillMount(){
+      AsyncStorage.getItem('@PawsStore:user').then((data) =>{
+        var user = JSON.parse(data)
+        this.setState({user:user})
+      });
+        
   }
 
   render() {
+    if (this.state.user == null) {
+      return (
+            <LoginMaster></LoginMaster>
+          );
+    }
     return (
-      <Navigator style={{backgroundColor: '#fff'}}
-          initialRoute={{name:'Login'}}
-          renderScene={this.renderScene}
-          configureScene={(route) => {
-            if(route.sceneConfig) {
-              return route.sceneConfig;
-            }
-            return Navigator.SceneConfigs.FloatFromRight;
-          }}/>
+      <Main></Main>
     );
   }
 }

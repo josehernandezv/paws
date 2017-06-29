@@ -20,8 +20,7 @@ import {
 
 const SideBar = require('./sideBar');
 const Navigator = require('../../node_modules/react-native-deprecated-custom-components/src/Navigator');
-const Login = require('./loginView');
-const SignUp = require('./signupView');
+import LoginMaster from './loginMaster';
 const First = require('./firstView');
 const Second = require('./secondView');
 const SearchAnimals = require('./searchAnimalsView');
@@ -39,24 +38,34 @@ const DigestiveNecessities = require('./notifications/digestiveNecessitiesView')
 const Hair = require('./notifications/hairCareView');
 const MyPets = require('./myPetsView');
 
-class mainView extends Component {
+
+class NavigationBar extends Navigator.NavigationBar {
+    render() {
+        var routes = this.props.navState.routeStack;
+        if(routes.length){
+            var route = routes[routes.length -1];
+        }
+        if (!route.display) {
+            return null;
+        }
+        return super.render();
+    }
+}
+
+export default class mainView extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { 
-            user: this.props.route.passProps.user
-        };
     }
 
     renderScene(route, navigator) {
+        route.display = true;
         switch (route.name) {
             case 'Login':
+                route.display = false;
+                console.log(LoginMaster)
                 return (
-                    <Login {...route.props} navigator={navigator} route={route}></Login>
-                );
-            case 'Signup':
-                return (
-                    <SignUp {...route.props} navigator={navigator} route={route}></SignUp>
+                    <LoginMaster {...route.props} navigator={navigator} route={route}></LoginMaster>
                 );
             case 'First':
                 return (
@@ -186,7 +195,7 @@ class mainView extends Component {
                 
                 <Navigator ref="navigator"
                     style={{backgroundColor: '#fff'}}
-                    initialRoute={{name:'First', title: 'Paws', passProps: {user: self.state.user}}}
+                    initialRoute={{name:'First', title: 'Paws', passProps: {}}}
                     renderScene={this.renderScene.bind(this)}
                     configureScene={(route) => {
                         if(route.sceneConfig) {
@@ -195,7 +204,7 @@ class mainView extends Component {
                         return Navigator.SceneConfigs.FloatFromRight;
                     }}
                      navigationBar={
-                         <Navigator.NavigationBar style={styles.header} routeMapper={this.getNavigatorBarRouteMapper()} />
+                         <NavigationBar style={styles.header} routeMapper={this.getNavigatorBarRouteMapper()} />
                     }         
                 />
 
@@ -208,6 +217,7 @@ class mainView extends Component {
         return this.refs.navigator;
     }
 }
+
 
 const styles = StyleSheet.create({
   container: {

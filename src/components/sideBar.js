@@ -97,7 +97,7 @@ const noPetsData = [
     icon: 'md-log-out',
   },
 ];
-class mainView extends Component {
+class sideBar extends Component {
 
     constructor(props) {
         super(props);
@@ -191,12 +191,23 @@ class mainView extends Component {
     }
 
     navigate(data) {
+        if (data.route == 'Login') {
+            this.logout();
+        }
         this.props.navigator().replace({
             name: data.route,
             title: data.name,
             passProps: {}
         });
+        
         setTimeout(() => { this.props.close();},300)
+    }
+
+    async logout(){
+        try {
+            await AsyncStorage.removeItem('@PawsStore:user');
+        } catch (error) {
+        }
     }
 
     render() {
@@ -313,4 +324,4 @@ const styles = StyleSheet.create({
   },
 });
 
-module.exports = mainView;
+module.exports = sideBar;
