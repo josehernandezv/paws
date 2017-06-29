@@ -26,7 +26,8 @@ export default class formMedicalRecordView extends Component {
 				isUpdate: false,
 				nameError: false,
 				userId: '',
-				petId: ''
+				petId: '',
+				isLoaded: true
 			};
 		} else {
 			this.state = { 
@@ -38,7 +39,8 @@ export default class formMedicalRecordView extends Component {
 				isUpdate: true,
 				key: record.key,
 				userId: record.userId,
-				petId: record.petId
+				petId: record.petId,
+				isLoaded: true
 			};
 		}
     }
@@ -75,6 +77,7 @@ export default class formMedicalRecordView extends Component {
     }
 
     addRecord () {
+		this.setState({isLoaded: false})
     	var self = this;
         try {
 
@@ -87,33 +90,33 @@ export default class formMedicalRecordView extends Component {
 					userId: this.state.userId,
 					petId: this.state.petId
 				});
+				this.setState({isLoaded: true})
 				Alert.alert('Success', 'Medical record successfully added!',
-				[
-				{text: 'OK', onPress: () => {
-							self.props.route.refreshList()		  		
-							self.props.navigator.replace({
-								name: 'IndividualMedicalRecord',
-								title: 'Medical Record',
-								passProps: {record: {
-									title: this.state.title,
-									date: this.state.simpleText,
-									details: this.state.details,
-									key: newRecord.key
-								}}
-							})}}
-				]
-			);
+					[{text: 'OK', onPress: () => {
+						self.props.route.refreshList()		  		
+						self.props.navigator.replace({
+							name: 'IndividualMedicalRecord',
+							title: 'Medical Record',
+							passProps: {record: {
+								title: this.state.title,
+								date: this.state.simpleText,
+								details: this.state.details,
+								key: newRecord.key
+							}}
+						})}}
+					]);
 			} else {
+				this.setState({isLoaded: true})
 				Alert.alert("Error", "All the fields are required");
 			}
-
-        	
         } catch (error) {
+			self.setState({isLoaded: true})
             self.showToast(error.message);
         }
     }
 
 	editRecord () {
+		this.setState({isLoaded: false})
     	var self = this;
         try {
         	var record = firebase.database().ref("medicalRecords/" + this.state.key);
@@ -124,6 +127,7 @@ export default class formMedicalRecordView extends Component {
 				 userId: this.state.userId,
 				 petId: this.state.petId
             });
+			this.setState({isLoaded: true})
         	Alert.alert('Success', 'Medical record successfully edited!',
             [
               {text: 'OK', onPress: () => {
@@ -139,6 +143,7 @@ export default class formMedicalRecordView extends Component {
             ]
           )
         } catch (error) {
+			self.setState({isLoaded: true})
             self.showToast(error.message);
         }
     }
@@ -166,6 +171,13 @@ export default class formMedicalRecordView extends Component {
         }
     }
 
+	renderLoadingView() {
+        return (
+            <View style={styles.loadingView}>
+                <Spinner color='#009688' />
+            </View>
+        );
+    }
 
 	render() {
 		return (
@@ -201,7 +213,7 @@ export default class formMedicalRecordView extends Component {
 							</Button>
 					
 					</Form>
-			
+			{!this.state.isLoaded ? this.renderLoadingView() : null} 
 			</Content>
 		
 		</Container>
@@ -261,7 +273,17 @@ const styles = StyleSheet.create({
 	},
 	error: {
     	borderColor: 'red'
-  	}
+  	},
+	loadingView: {
+		position: 'absolute',
+		top: 0,
+		bottom: 0,
+		left: 0,
+		right: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0,0,0,0.5)',
+	}
 });
 
 module.exports = formMedicalRecordView;

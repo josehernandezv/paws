@@ -12,13 +12,15 @@ import {
 
 import { 
     Container,
+    Content,
     Footer, 
     FooterTab,
     Button,
     Icon,
     Item,
     Input,
-    Toast
+    Toast,
+    Spinner
 } from 'native-base';
 
 import GoogleSignIn from 'react-native-google-sign-in';
@@ -32,7 +34,8 @@ class loginView extends Component {
         super(props);
         this.state = { 
             email: '' ,
-            password: ''
+            password: '',
+            isLoaded: true
         };
     }
 
@@ -46,6 +49,7 @@ class loginView extends Component {
     }
 
     async login() {
+        this.setState({isLoaded: false})
         var self = this;
         try {
             await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
@@ -53,6 +57,7 @@ class loginView extends Component {
                  self.redirectHome(snapshot.val());
             });
         } catch (error) {
+            self.setState({isLoaded: true})
             self.showToast(error.message);
         }
     }
@@ -65,12 +70,14 @@ class loginView extends Component {
                 passProps: { user: user} 
             });
         } catch (error) {
+            this.setState({isLoaded: true})            
             this.showToast(error.message)
         }
 
     }
 
     async facebookLogin() {
+        this.setState({isLoaded: false})        
         var self = this;
         FBLoginManager.loginWithPermissions(['email'], (error, data) => {
             if (!error) {
@@ -85,9 +92,11 @@ class loginView extends Component {
                                 username: profile.name
                             });
                         }).catch(function(error) {
+                            self.setState({isLoaded: true}) 
                             self.showToast(error);
                         });
                     } else {
+                       self.setState({isLoaded: true})                        
                        self.showToast('Please sign in first');                      
                     }
                  });
@@ -96,6 +105,7 @@ class loginView extends Component {
     }
 
     async googleLogin() {
+        this.setState({isLoaded: false})        
         var self = this;
         await GoogleSignIn.configure({
             clientID: '804759165602-qim4grv81neao38olojij9lnin9gdhna.apps.googleusercontent.com',
@@ -115,18 +125,28 @@ class loginView extends Component {
                         username: user.givenName
                     });
                 }).catch(function(error) {
+                    self.setState({isLoaded: true}) 
                     self.showToast(error.message)
                 }) 
             } else {
+                self.setState({isLoaded: true}) 
                 self.showToast('Please sign in first')
             }
         });
     }
 
+    renderLoadingView() {
+        return (
+            <View style={styles.loadingView}>
+                <Spinner color='#009688' />
+            </View>
+        );
+    }
+
     render() {
         return (
             <Container>
-                <StatusBar backgroundColor="#000" barStyle="light-content"/>
+                <StatusBar backgroundColor="#000" barStyle="light-content"/>            
                 <Image style={styles.container} source={require('../images/LoginBackground.jpg')}>
                     <Image style={styles.title} source={require('../images/Title.png')}/>
                     <Item rounded style={StyleSheet.flatten(styles.item)}>
@@ -173,6 +193,7 @@ class loginView extends Component {
                         </Button>
                     </FooterTab>
                 </Footer>
+                {!this.state.isLoaded ? this.renderLoadingView() : null} 
             </Container>
         );
     }
@@ -213,6 +234,16 @@ const styles = StyleSheet.create({
   },
   footer: {
     backgroundColor: '#146DC1'
+  },
+  loadingView: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   }
   
 });

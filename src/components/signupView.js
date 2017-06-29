@@ -34,7 +34,8 @@ class signupView extends Component {
             email: '' ,
             username: '',
             password: '',
-            confirmPassword: ''
+            confirmPassword: '',
+            isLoaded: true
         };
     }
 
@@ -48,6 +49,7 @@ class signupView extends Component {
     }
 
     async signup() {
+        this.setState({isLoaded: false})
         var self = this;
         if (this.state.password == this.state.confirmPassword) {
             if (this.state.username) {
@@ -64,18 +66,22 @@ class signupView extends Component {
                         username: this.state.username
                     })                
                 } catch (error) {
+                    self.setState({isLoaded: true})
                     self.showToast(error.message)
                 }             
                     
             } else {
+                self.setState({isLoaded: true})
                 self.showToast('Username can\'t be empty ')
             }
         } else {
+            self.setState({isLoaded: true})
             self.showToast('Passwords must match');
         }
     }
 
     async facebookSignup() {
+        this.setState({isLoaded: false})
         var self = this;
         FBLoginManager.loginWithPermissions(['email'], (error, data) => {
             if (!error) {
@@ -105,6 +111,7 @@ class signupView extends Component {
                                 })
                                              
                             } catch (error) {
+                                self.setState({isLoaded: true})
                                 self.showToast(error.message)
                             }             
                         }
@@ -113,9 +120,11 @@ class signupView extends Component {
 
 
                 }).catch(function(error) {
+                    self.setState({isLoaded: true})
                     self.showToast(error);
                 });
             } else {
+                self.setState({isLoaded: true})
                 console.log(error, data);
             }
         });
@@ -123,6 +132,7 @@ class signupView extends Component {
     }
 
     async googleSignup() {
+        this.setState({isLoaded: false})
         var self = this;
         await GoogleSignIn.configure({
             clientID: '804759165602-qim4grv81neao38olojij9lnin9gdhna.apps.googleusercontent.com',
@@ -157,11 +167,13 @@ class signupView extends Component {
                         });
                                      
                     } catch (error) {
+                        self.setState({isLoaded: true})
                         self.showToast(error.message)
                     }             
                 }
             });
         }).catch(function(error) {
+            self.setState({isLoaded: true})
             self.showToast(error);
         });
     }
@@ -174,9 +186,18 @@ class signupView extends Component {
                 passProps: { user: user} 
             });
         } catch (error) {
+            this.setState({isLoaded: true})
             this.showToast(error.message)
         }
 
+    }
+
+    renderLoadingView() {
+        return (
+            <View style={styles.loadingView}>
+                <Spinner color='#009688' />
+            </View>
+        );
     }
 
     render() {
@@ -244,6 +265,7 @@ class signupView extends Component {
                         </Button>
                     </FooterTab>
                 </Footer>
+                {!this.state.isLoaded ? this.renderLoadingView() : null} 
             </Container>
         );
     }
@@ -283,6 +305,16 @@ const styles = StyleSheet.create({
   },
   footer: {
     backgroundColor: '#EF8D32'
+  },
+  loadingView: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   }
   
 });
