@@ -138,7 +138,7 @@ class loginView extends Component {
     renderLoadingView() {
         return (
             <View style={styles.loadingView}>
-                <Spinner color='#009688' />
+                <Spinner color='#ffffff' />
             </View>
         );
     }

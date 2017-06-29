@@ -107,6 +107,11 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
         });
     }
 
+    refresh() {
+        this.setState({isLoaded: false})
+        this.getData().done();
+    }
+
     render() {
         if (!this.state.isLoaded) {
             return this.renderLoadingView();
@@ -161,7 +166,8 @@ import { Container, Content, List, Item, ListItem, CheckBox, Header,
                  onPress={() => this.props.navigator.push({
                      name: 'FormAddPet',
                      title: 'Edit Pet Info',
-                     passProps: {pet: pet}
+                     passProps: {pet: pet},
+                     refreshList: this.refresh.bind(this)
                  })}/>
                  </Button>
                    

@@ -6,7 +6,7 @@ import { View, Text, StyleSheet, DatePickerAndroid, TouchableWithoutFeedback, Te
 from 'react-native';
 
 import { Container, Content, Header, Button, Title, Right, Left, Body, Icon, Form, Item,
-	Label, Input, Footer, InputGroup, Textarea, Toast } from 'native-base';
+	Label, Input, Footer, InputGroup, Textarea, Toast, Spinner } from 'native-base';
 
 const firebase = require('../database/firebase')
 
@@ -174,7 +174,7 @@ export default class formMedicalRecordView extends Component {
 	renderLoadingView() {
         return (
             <View style={styles.loadingView}>
-                <Spinner color='#009688' />
+                <Spinner color='#ffffff' />
             </View>
         );
     }

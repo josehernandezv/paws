@@ -36,6 +36,7 @@ import { Container, Content, List, Item, ListItem,
         }
 
         refresh() {
+            this.setState({isLoaded: false})
             this.getRecords().done();
         }
 

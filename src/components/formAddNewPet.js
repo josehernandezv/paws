@@ -29,7 +29,8 @@ import {
     InputGroup,
     Title,
     Textarea,
-    Radio
+    Radio,
+    Spinner
 } from 'native-base';
 
 import {
@@ -97,7 +98,8 @@ class formAddNewPet extends Component {
                 id: ''
             },
             // imgUrl:  this.passProps.animal.specie == 'Dog' ? '../images/dog_shape.jpg' : '../images/cat_shape.jpg'
-            imgUrl:  this.passProps.animal.imgUrl
+            imgUrl:  this.passProps.animal.imgUrl,
+            isLoaded: true
         };
         } else {
             this.state ={
@@ -125,7 +127,8 @@ class formAddNewPet extends Component {
                 id: ''
             },
             // imgUrl:  this.passProps.animal.specie == 'Dog' ? '../images/dog_shape.jpg' : '../images/cat_shape.jpg'
-            imgUrl:  pet.imgUrl
+            imgUrl:  pet.imgUrl,
+            isLoaded: true
         };
         }
     }
@@ -155,6 +158,7 @@ class formAddNewPet extends Component {
     }
 
     addPet(){
+        this.setState({isLoaded: false})
         if(this.state.option){
             this.state.gender = "male"
         } else {
@@ -191,7 +195,7 @@ class formAddNewPet extends Component {
                         physical: {state: false},
                         digestive: {state: false}
                     })
-
+                    this.setState({isLoaded: true})
                     Alert.alert('Success', this.state.name + ' has been added to your pets!',
                     [
                         {text: 'OK', onPress: () => {   
@@ -210,10 +214,11 @@ class formAddNewPet extends Component {
                         height: this.state.height,
                         imgUrl: data         
                     });
-
+                    this.setState({isLoaded: true})
                     Alert.alert('Success', this.state.name + ' has been edited!',
                     [
                         {text: 'OK', onPress: () => {   
+                            this.props.route.refreshList()
                             this.props.navigator.popToTop()
                             this.props.refreshMenu();   
                         }}
@@ -224,6 +229,7 @@ class formAddNewPet extends Component {
             }.bind(this))
                         
         } else {
+            this.setState({isLoaded: true})
             Alert.alert("Error", "All the fields are required");
         }
     }
@@ -312,6 +318,14 @@ class formAddNewPet extends Component {
                 })
             }
         })
+    }
+
+    renderLoadingView() {
+        return (
+            <View style={styles.loadingView}>
+                <Spinner color='#ffffff' />
+            </View>
+        );
     }
     
     render() {
@@ -418,8 +432,8 @@ class formAddNewPet extends Component {
 						</Button>
 					
 					</Form>
-
                 </Content>
+                {!this.state.isLoaded ? this.renderLoadingView() : null}
             </Container>
             
         )
@@ -467,8 +481,17 @@ const styles = StyleSheet.create({
   },
   error: {
     borderColor: 'red'
+  },
+  loadingView: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   }
-  
 });
 
 module.exports = formAddNewPet;
