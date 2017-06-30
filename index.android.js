@@ -13,6 +13,10 @@ import {
   AsyncStorage
 } from 'react-native';
 
+import {
+  Spinner
+} from 'native-base'
+
 // import Navigator from 'react-native-deprecated-custom-components'
 const Navigator = require('./node_modules/react-native-deprecated-custom-components/src/Navigator');
 
@@ -29,19 +33,29 @@ export default class Paws extends Component {
   constructor(props) {
         super(props)
         this.state = { 
-            user: null
+            user: null,
+            isLoaded: false
         };
     }
 
   componentWillMount(){
       AsyncStorage.getItem('@PawsStore:user').then((data) =>{
         var user = JSON.parse(data)
-        this.setState({user:user})
+        this.setState({user:user, isLoaded: true})
+      },(err) =>{
+        this.setState({isLoaded: true})
       });
         
   }
 
   render() {
+    if (!this.state.isLoaded) {
+      return (
+        <View style={styles.container}>
+            <Spinner color='#009688' />
+        </View>
+      )
+    }
     if (this.state.user == null) {
       return (
             <LoginMaster></LoginMaster>
@@ -58,7 +72,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#fff',
   },
   welcome: {
     fontSize: 20,
