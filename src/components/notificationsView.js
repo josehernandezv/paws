@@ -115,7 +115,7 @@ class notificationsView extends Component {
                         onPress={() => this.props.navigator.push({
                             name: 'Nutrition',
                             title: 'Nutrition Notifications',
-                            passProps: {}
+                            passProps: { state: this.state.falseSwitchIsOnNutrition }
                         })}>
             <Left>
             <Thumbnail square source={require('../images/nutrition.png')}/>
