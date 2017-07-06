@@ -20,6 +20,7 @@ import {
 // import Navigator from 'react-native-deprecated-custom-components'
 const Navigator = require('./node_modules/react-native-deprecated-custom-components/src/Navigator');
 
+import PushNotificationController from "./src/components/notifications/pushNotificationController";
 
 //components
 const Login = require('./src/components/loginView');
@@ -62,7 +63,9 @@ export default class Paws extends Component {
           );
     }
     return (
-      <Main></Main>
+      <Main>
+         <PushNotificationController />
+      </Main>
     );
   }
 }
