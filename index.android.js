@@ -27,6 +27,7 @@ const Login = require('./src/components/loginView');
 const LoginMaster = require('./src/components/loginMaster');
 const SignUp = require('./src/components/signupView');
 const Main = require('./src/components/mainView');
+console.disableYellowBox = true;
 console.ignoredYellowBox = ['Setting a timer'];
 
 export default class Paws extends Component {

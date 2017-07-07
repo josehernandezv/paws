@@ -2,10 +2,14 @@
 
 import React, { Component } from 'react';
 
-import { View, Text, StyleSheet, DatePickerAndroid, TouchableWithoutFeedback, TextInput, Alert, TimePickerAndroid } from 'react-native';
+import { View, Text, StyleSheet, DatePickerAndroid, TouchableWithoutFeedback, TextInput, Alert, TimePickerAndroid, AsyncStorage } from 'react-native';
 
 import { Container, Content, Header, Button, Title, Right, Left, Body, Icon, Form, Item,
 	Label, Input, Footer, InputGroup, Textarea, Toast, List, ListItem, Picker } from 'native-base';
+
+import moment from 'moment';
+
+const PushNotification = require('./PushNotification')
 
 export default class medicalCareView extends Component {
 	
@@ -72,6 +76,34 @@ export default class medicalCareView extends Component {
     }
   }
 
+
+	setNotification() {
+		// var date = new Date(this.state.simpleDate.getFullYear(),
+		// 									 this.state.simpleDate.getMonth(),
+		// 									 this.state.simpleDate.getDay(),
+		// 									 this.state.isoFormatHour,
+		// 									 this.state.isoFormatMinute,
+		// 									 0,
+		// 									 0) 
+			
+		// date = moment(date, 'YYYY-MM-DD HH:mm').toDate()
+		var date = new Date(Date.now())
+		date.setFullYear(this.state.simpleDate.getFullYear())
+		date.setMonth(this.state.simpleDate.getMonth())
+		date.setDate(this.state.simpleDate.getDay())
+		
+		
+		PushNotification.localNotificationSchedule({
+				message: 'Today ' + this.state.pet.name + ' has a date with the doctor',
+				title: 'Medical appointment',
+				date: new Date(Date.now() + (60 * 1000))
+		})
+		Alert.alert('Success', 'Notification setted successfully!',
+					[{text: 'OK', onPress: () => {
+						this.props.navigator.pop();	
+					}}]
+		);
+	}	
  
 
 	
