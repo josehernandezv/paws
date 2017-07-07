@@ -86,7 +86,7 @@ export default class medicalCareView extends Component {
 							<ListItem>
 								<Body>
 									<Text 
-										style={{marginBottom:20}}>Choose how many times a day you want to feed your pet:</Text>
+										style={{marginBottom:20}}>Choose the date for the next appointment schedule for your pet:</Text>
 								
 									<TouchableWithoutFeedback
 										onPress={this.showPicker.bind(this, 'simple', {date: this.state.simpleDate})}>
@@ -99,7 +99,7 @@ export default class medicalCareView extends Component {
 							<ListItem>
 								<Body>
 									<Text
-										style={{marginBottom:20}}>Choose how many times a day you want to give your pet some water:</Text>
+										style={{marginBottom:20}}>Choose the time you want to be reminded of on that day:</Text>
 										<TouchableWithoutFeedback
 											onPress={this.showPicker2.bind(this, 'isoFormat', {
 											hour: this.state.isoFormatHour,

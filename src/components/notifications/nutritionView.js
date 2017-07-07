@@ -79,7 +79,7 @@ export default class nutritionView extends Component {
 
 							<ListItem>
 								<Body>
-									<Text>Choose the date for the next appointment schedule for your pet:</Text>
+									<Text>Choose how many times a day you want to feed your pet:</Text>
 								
 									<Picker
 										selectedValue={this.state.timeRangeFood}
@@ -92,7 +92,7 @@ export default class nutritionView extends Component {
 							</ListItem>
 							<ListItem>
 								<Body>
-									<Text>Choose the time you want to be remimded of on that day:</Text>
+									<Text>Choose how many times a day you want to give your pet some water:</Text>
 								
 									<Picker
 										selectedValue={this.state.timeRangeWater}
