@@ -28,7 +28,6 @@ export default class nutritionView extends Component {
 
 	componentDidMount() {
 		this.getPet().done()
-        this.getNotificationState().done();
     }
 
 	async getPet() {
@@ -42,25 +41,7 @@ export default class nutritionView extends Component {
         }
     }
 
-    async getNotificationState(){
-        var self = this;
-        try {
-            firebase.database().ref("notifications").orderByChild("petId").once("value", function(snapshot){
-            snapshot.forEach(function(child){
-                if(self.state.pet.id !== 'undifined' && self.state.pet.id === child.val().petId){
-                    child.key,
-                    self.setState({falseSwitchIsOnNutrition: child.val().nutrition.state})                    
-                }
-            });
-        });
-            
-        } catch (error) {
-            
-        }
-        
-    }
-
-	 updateNotificationState(value, type) {
+	updateNotificationState(value, type) {
         
         var self = this;
         firebase.database().ref("notifications").orderByChild("petId").equalTo(self.state.pet.id).on("child_added",function(snapshot) {
@@ -81,24 +62,24 @@ export default class nutritionView extends Component {
                     <Form>
 						<List> 
 
-							<ListItem>
+							{/*<ListItem>
 								<Body>
 									<Text style={{fontWeight: 'bold', fontSize: 17}}>{this.state.falseSwitchIsOnNutrition ? 'On' : 'Off'}</Text>
 								</Body>
 								<Right>
 									<Switch onValueChange={(value) => {
-										this.updateNotificationState(value, 'nutrition')
 										this.setState({falseSwitchIsOnNutrition: value})
+										this.updateNotificationState(value, 'nutrition')
 									}}
 									style={{marginBottom: 10}}
 									value={this.state.falseSwitchIsOnNutrition}
 									/>
 								</Right>
-							</ListItem>
+							</ListItem>*/}
 
 							<ListItem>
 								<Body>
-									<Text>Choose how many times a day you want to feed your pet:</Text>
+									<Text>Choose the date for the next appointment schedule for your pet:</Text>
 								
 									<Picker
 										selectedValue={this.state.timeRangeFood}
@@ -111,7 +92,7 @@ export default class nutritionView extends Component {
 							</ListItem>
 							<ListItem>
 								<Body>
-									<Text>Choose how many times a day you want to give your pet some water:</Text>
+									<Text>Choose the time you want to be remimded of on that day:</Text>
 								
 									<Picker
 										selectedValue={this.state.timeRangeWater}
