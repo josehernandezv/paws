@@ -12,6 +12,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.magus.fblogin.FacebookLoginPackage; // <--- import
 import com.reactlibrary.googlesignin.RNGoogleSignInPackage;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage; 
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +33,7 @@ public class MainApplication extends Application implements ReactApplication {
             new ImagePickerPackage(),
             new RNFetchBlobPackage(),
             new FacebookLoginPackage(),
+            new ReactNativePushNotificationPackage(),
            new RNGoogleSignInPackage() // <------ add the package
       );
     }
