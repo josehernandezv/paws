@@ -25,7 +25,7 @@ export default class medicalCareView extends Component {
 
 	componentDidMount() {
 		this.getPet().done()
-    }
+  }
 
 	async getPet() {
         try {
@@ -64,7 +64,7 @@ export default class medicalCareView extends Component {
         newState[stateKey + 'Hour'] = hour;
         newState[stateKey + 'Minute'] = minute;
       } else if (action === TimePickerAndroid.dismissedAction) {
-        newState[stateKey + 'Text'] = 'dismissed';
+        newState[stateKey + 'Text'] = 'Pick a time';
       }
       this.setState(newState);
     } catch ({code, message}) {
